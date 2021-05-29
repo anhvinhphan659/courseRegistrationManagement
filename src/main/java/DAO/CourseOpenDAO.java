@@ -1,17 +1,18 @@
 package DAO;
-import HibernateUtil.hibernateUtil;
-import POJO.CrmuserEntity;
-import  POJO.StudentEntity;
 
 import HibernateUtil.hibernateUtil;
+import POJO.CourseopenEntity;
+import POJO.StudentEntity;
+import POJO.SubjectEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public class StudentDAO
+public class CourseOpenDAO
 {
     private static Session session;
     private static Transaction tx;
-    public StudentDAO()
+
+    public CourseOpenDAO()
     {
         hibernateUtil hb=new hibernateUtil();
         Session current=hb.getSessionfactory().getCurrentSession();
@@ -21,42 +22,42 @@ public class StudentDAO
             session=hb.getSessionfactory().openSession();
     }
 
-    public StudentEntity getObject(String ID)
+    public CourseopenEntity getObject(String ID)
     {
-        StudentEntity ret;
+        CourseopenEntity ret;
         tx=session.beginTransaction();
-        ret=session.get(StudentEntity.class,ID);
+        ret=session.get(CourseopenEntity.class,ID);
         return ret;
     }
 
-    public void saveObject(StudentEntity student)
+    public void saveObject(CourseopenEntity course)
     {
-        if(student!=null) {
+        if(course!=null) {
             tx = session.beginTransaction();
 
-            session.save(student);
+            session.save(course);
             tx.commit();
         }
     }
 
-    public void removeObject(StudentEntity student)
+    public void removeObject(CourseopenEntity courseopen)
     {
-        if(student!=null) {
+        if(courseopen!=null) {
             tx = session.beginTransaction();
-            session.delete(student);
+            session.delete(courseopen);
             tx.commit();
         }
     }
 
     public void updateID(String oldID,String newID)
     {
-        StudentEntity student= getObject(oldID);
-        if(student!=null)
+        CourseopenEntity courseopen= getObject(oldID);
+        if(courseopen!=null)
         {
-            removeObject(student);
-            student.setStudentid(newID);
+            removeObject(courseopen);
+            courseopen.setOpenid(newID);
             Transaction tx=session.beginTransaction();
-            session.save(student);
+            session.save(courseopen);
             tx.commit();
 
         }

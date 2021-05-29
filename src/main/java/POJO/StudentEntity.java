@@ -1,5 +1,7 @@
 package POJO;
 
+import DAO.CRMuserDAO;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,6 +12,7 @@ public class StudentEntity {
     private Boolean gender;
     private String classid;
     private String userid;
+
 
     @Id
     @Column(name = "studentid")

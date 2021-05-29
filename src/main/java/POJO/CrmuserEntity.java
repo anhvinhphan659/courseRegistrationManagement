@@ -73,4 +73,13 @@ public class CrmuserEntity {
         result = 31 * result + (isadmin != null ? isadmin.hashCode() : 0);
         return result;
     }
+
+    public CrmuserEntity(String userid) {
+        this.userid = userid;
+    }
+
+    public CrmuserEntity ()
+    {
+
+    }
 }
