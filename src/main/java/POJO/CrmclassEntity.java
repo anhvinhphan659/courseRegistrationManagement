@@ -78,6 +78,17 @@ public class CrmclassEntity {
     }
 
     @Override
+    public String toString() {
+        return "CrmclassEntity{" +
+                "classid='" + classid + '\'' +
+                ", male=" + male +
+                ", female=" + female +
+                ", yearstart=" + yearstart +
+                ", yearend=" + yearend +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         int result = classid != null ? classid.hashCode() : 0;
         result = 31 * result + (male != null ? male.hashCode() : 0);

@@ -8,55 +8,22 @@ import POJO.*;
 
 public class hibernateUtil
 {
-    private Session session;
-    public  hibernateUtil()
-    {
+    private static final SessionFactory sessionfactory;
+    private static Session session;
+    static {
         try {
-            Configuration cfg = new Configuration().configure();
-            cfg.addAnnotatedClass(StudentEntity.class);
-            cfg.addAnnotatedClass(CourseopenEntity.class);
-            cfg.addAnnotatedClass(CourseregistEntity.class);
-            cfg.addAnnotatedClass(CrmclassEntity.class);
-            cfg.addAnnotatedClass(SubjectEntity.class);
-            cfg.addAnnotatedClass(SemesterEntity.class);
-            cfg.addAnnotatedClass(CrmuserEntity.class);
-            SessionFactory sf = cfg.buildSessionFactory();
-            session = sf.openSession();
+
+            sessionfactory = new Configuration().configure().buildSessionFactory();
+
         }
-        catch (Throwable ex)
+        catch (Exception ex)
         {
-            System.err.println("Failed to create Session " +ex);
+            System.out.println("Initial Sesson factory error!");
+            throw (ex);
         }
     }
-    public Session getSession()
+    public SessionFactory getSessionfactory()
     {
-        return  session;
-    }
-    public void saveObject(Object obj)
-    {
-        if(session!=null) {
-            Transaction tx;
-            tx = session.beginTransaction();
-            session.save(obj);
-            tx.commit();
-        }
-    }
-    public void updateObject(Object obj)
-    {
-        if(session!=null) {
-            Transaction tx;
-            tx = session.beginTransaction();
-            session.update(obj);
-            tx.commit();
-        }
-    }
-    public void removeObject(Object obj)
-    {
-        if(session!=null) {
-            Transaction tx;
-            tx = session.beginTransaction();
-            session.remove(obj);
-            tx.commit();
-        }
+        return sessionfactory;
     }
 }
