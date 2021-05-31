@@ -82,4 +82,14 @@ public class CrmuserEntity {
     {
 
     }
+
+    @Override
+    public String toString() {
+        return "CrmuserEntity{" +
+                "userid='" + userid + '\'' +
+                ", account='" + account + '\'' +
+                ", pass='" + pass + '\'' +
+                ", isadmin=" + isadmin +
+                '}';
+    }
 }
