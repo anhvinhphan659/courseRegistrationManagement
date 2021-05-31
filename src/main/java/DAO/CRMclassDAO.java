@@ -1,8 +1,10 @@
 package DAO;
 
+import java.util.ArrayList;
 import java.util.List;
 import POJO.CrmclassEntity;
 import HibernateUtil.hibernateUtil;
+import POJO.CrmuserEntity;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -114,6 +116,33 @@ public class CRMclassDAO
         tx= session.beginTransaction();
         session.delete(delObj);
         tx.commit();
+    }
+    public List<CrmclassEntity> getListObject()
+    {
+        String hql="FROM CrmclassEntity";
+
+        Query data= session.createQuery(hql);
+        List<CrmclassEntity> ret=data.list();
+        return ret;
+    }
+
+    public static Object[][] convertToObject(List<CrmclassEntity>data)
+    {
+        if(data!=null) {
+            int size = data.size();
+            List<Object[]> ret=new ArrayList<>();
+            for(int i=0;i<size;i++)
+            {
+                CrmclassEntity temp=data.get(i);
+                Object[] add={temp.getClassid(),temp.getMale(),temp.getFemale(),
+                        temp.getFemale()+temp.getMale(),
+                        Integer.valueOf(temp.getYearstart())+ "-"+Integer.valueOf(temp.getYearend()) };
+                ret.add(add);
+            }
+            return ret.toArray(new Object[0][]);
+
+        }
+        return null;
     }
 
 }

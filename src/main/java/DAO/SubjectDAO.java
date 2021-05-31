@@ -2,9 +2,14 @@ package DAO;
 
 import HibernateUtil.hibernateUtil;
 
+import POJO.CrmuserEntity;
 import POJO.SubjectEntity;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SubjectDAO
 {
@@ -59,5 +64,30 @@ public class SubjectDAO
             tx.commit();
 
         }
+    }
+    public List<SubjectEntity> getListObject()
+    {
+        String hql="FROM SubjectEntity";
+
+        Query data= session.createQuery(hql);
+        List<SubjectEntity> ret=data.list();
+        return ret;
+    }
+
+    public static Object[][] convertToObject(List<SubjectEntity>data)
+    {
+        if(data!=null) {
+            int size = data.size();
+            List<Object[]> ret=new ArrayList<>();
+            for(int i=0;i<size;i++)
+            {
+                SubjectEntity temp=data.get(i);
+                Object[] add={temp.getSubjectid(),temp.getSubjectname(),temp.getCredit(),temp.getFalculty()};
+                ret.add(add);
+            }
+            return ret.toArray(new Object[0][]);
+
+        }
+        return null;
     }
 }

@@ -3,9 +3,13 @@ package DAO;
 
 import POJO.CrmuserEntity;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.Query;
 import org.hibernate.Transaction;
 import HibernateUtil.hibernateUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class CRMuserDAO
 {
@@ -57,6 +61,32 @@ public class CRMuserDAO
             tx.commit();
 
         }
+    }
+
+    public List<CrmuserEntity> getListObject()
+    {
+        String hql="FROM CrmuserEntity";
+
+        Query data= session.createQuery(hql);
+        List<CrmuserEntity> ret=data.list();
+        return ret;
+    }
+
+    public static Object[][] convertToObject(List<CrmuserEntity>data)
+    {
+        if(data!=null) {
+            int size = data.size();
+            List<Object[]> ret=new ArrayList<>();
+            for(int i=0;i<size;i++)
+            {
+                CrmuserEntity temp=data.get(i);
+                Object[] add={temp.getUserid(),temp.getAccount(),temp.getPass(),temp.getIsadmin()};
+                ret.add(add);
+            }
+            return ret.toArray(new Object[0][]);
+
+        }
+        return null;
     }
 
 

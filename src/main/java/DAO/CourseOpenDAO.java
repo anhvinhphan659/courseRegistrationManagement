@@ -2,10 +2,15 @@ package DAO;
 
 import HibernateUtil.hibernateUtil;
 import POJO.CourseopenEntity;
+import POJO.CrmuserEntity;
 import POJO.StudentEntity;
 import POJO.SubjectEntity;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CourseOpenDAO
 {
@@ -61,5 +66,35 @@ public class CourseOpenDAO
             tx.commit();
 
         }
+    }
+
+    public List<CourseopenEntity> getListObject()
+    {
+        String hql="FROM CourseopenEntity ";
+
+        Query data= session.createQuery(hql);
+        List<CourseopenEntity> ret=data.list();
+        return ret;
+    }
+
+    public static Object[][] convertToObject(List<CourseopenEntity>data)
+    {
+        if(data!=null) {
+            int size = data.size();
+            List<Object[]> ret=new ArrayList<>();
+            for(int i=0;i<size;i++)
+            {
+                CourseopenEntity temp=data.get(i);
+                Object[] add={temp.getSubjectid(),temp.getCourseclass(),
+                        "("+Integer.valueOf(temp.getBeginshift())
+                        + "-" + Integer.valueOf(temp.getEndshift())
+                        +") "+ Integer.valueOf(temp.getDiw()),
+                        temp.getTeacher(),temp.getMaxtotal()};
+                ret.add(add);
+            }
+            return ret.toArray(new Object[0][]);
+
+        }
+        return null;
     }
 }
