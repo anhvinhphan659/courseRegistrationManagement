@@ -20,6 +20,12 @@ public class MainUI
         mainframe.setResizable(false);
         mainframe.setVisible(true);
     }
+
+    public JFrame getMainframe()
+    {
+        return mainframe;
+    }
+
     public void setUpMain()
     {
         mainframe.setVisible(true);
