@@ -157,7 +157,7 @@ public class AcademicUI
         currentPanel.setLayout(new BorderLayout());
 
         String headerTable[]={"UserID","Account","Password","isAdmin"};
-
+        //set up data display
         DefaultTableModel df=new DefaultTableModel(userTableData,headerTable);
         JTable accountTable=new JTable(df) {
             @Override
@@ -240,6 +240,10 @@ public class AcademicUI
                 setUpAdd(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
             }
         });
+
+
+        JPanel contain1=new JPanel();
+        JPanel contain2=new JPanel();
         
         currentPanel.add(emptyPanel,BorderLayout.NORTH);
         currentPanel.add(accountScroll,BorderLayout.CENTER);
@@ -424,6 +428,9 @@ public class AcademicUI
             }
         });
 
+        //set up for class information
+        JComboBox classComboBox=new JComboBox();
+
         currentPanel.add(emptyPanel,BorderLayout.NORTH);
         currentPanel.add(accountScroll,BorderLayout.CENTER);
         currentPanel.add(editPanel,BorderLayout.EAST);
@@ -439,6 +446,7 @@ public class AcademicUI
 
 
         DefaultTableModel df=new DefaultTableModel(courseTableData,headerTable);
+
         JTable courseTable=new JTable(df)
         {
             @Override
@@ -621,4 +629,42 @@ public class AcademicUI
         addFrame.setVisible(true);
     }
 
+}
+
+class handleData
+{
+    public static Object[][] getDatawithState(Object[][]data,int boolColumn,Boolean val)
+    {
+        Object[][] ret;
+        List<Object[]> listData=Arrays.asList(data);
+        List<Object[]> listRet=new ArrayList<>();
+        for(int i=0;i<listData.size();i++)
+        {
+            if(listData.get(i)[boolColumn]==val)
+                listRet.add(listData.get(i));
+        }
+
+        ret=listRet.toArray(new Object[0][]);
+        return ret;
+    }
+
+    public static Object[][] removeData(Object[][]data,int row)
+    {
+        Object[][] ret;
+        List<Object[]> listData=Arrays.asList(data);
+        listData.remove(row);
+
+        ret=listData.toArray(new Object[0][]);
+        return ret;
+    }
+
+    public static Object[][] addData(Object[][]data,Object[]newData)
+    {
+        Object[][] ret;
+        List<Object[]> listData=Arrays.asList(data);
+        listData.add(newData);
+
+        ret=listData.toArray(new Object[0][]);
+        return ret;
+    }
 }
