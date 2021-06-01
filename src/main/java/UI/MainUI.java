@@ -1,7 +1,11 @@
 package UI;
 
+import DAO.CRMuserDAO;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainUI
 {
@@ -24,6 +28,10 @@ public class MainUI
     public JFrame getMainframe()
     {
         return mainframe;
+    }
+    public void setMainframe(JFrame anotherFrame)
+    {
+        mainframe=anotherFrame;
     }
 
     public void setUpMain()
@@ -86,11 +94,52 @@ public class MainUI
         signin.setBackground(new Color(10,130,180));
         signin.setForeground(Color.WHITE);
         signin.setFont(new Font(_FONT_STYLE,Font.BOLD,20));
+
+
+
         centerPanel.add(signin);
 
         loginPanel.add(topPanel,BorderLayout.NORTH);
         loginPanel.add(centerPanel,BorderLayout.CENTER);
+        signin.addMouseListener(new MouseAdapter()
+        {
+            public void mouseClicked(MouseEvent e)
+            {
+                String acc=account.getText();
+                String pas=pass.getText();
+                if(acc.isEmpty()||pas.isEmpty())
+                    JOptionPane.showMessageDialog(null,"Fill in account and password to sign in!");
+                else
+                {
+                    CRMuserDAO crMuserDAO=new CRMuserDAO();
+                    int check=crMuserDAO.checkAccount(acc,pas);
 
+                    switch (check)
+
+                    {
+                        case 0:
+                            JOptionPane.showMessageDialog(null,"Password is not correct!");
+                            break;
+                        case -1:
+                            JOptionPane.showMessageDialog(null,"Account is not existed! Please contact with Academic Faculty to get account!");
+                            break;
+                        case 1:
+                            StudentUI studentUI=new StudentUI();
+                            mainframe.dispose();
+
+
+                            studentUI.setUpDisplay();
+                            break;
+                        default:
+                            AcademicUI academicUI=new AcademicUI();
+                            mainframe.dispose();
+                            academicUI.setUpDisplay();
+                    }
+
+
+                }
+            }
+        });
 
         return loginPanel;
     }
