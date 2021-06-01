@@ -30,7 +30,8 @@ public class CourseOpenDAO
     public CourseopenEntity getObject(String ID)
     {
         CourseopenEntity ret;
-        tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         ret=session.get(CourseopenEntity.class,ID);
         return ret;
     }
@@ -38,7 +39,8 @@ public class CourseOpenDAO
     public void saveObject(CourseopenEntity course)
     {
         if(course!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
 
             session.save(course);
             tx.commit();
@@ -48,7 +50,8 @@ public class CourseOpenDAO
     public void removeObject(CourseopenEntity courseopen)
     {
         if(courseopen!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.delete(courseopen);
             tx.commit();
         }
@@ -68,12 +71,14 @@ public class CourseOpenDAO
         }
     }
 
-    public List<CourseopenEntity> getListObject()
+    public List<CourseopenEntity> getListObjects()
     {
         String hql="FROM CourseopenEntity ";
 
+
         Query data= session.createQuery(hql);
         List<CourseopenEntity> ret=data.list();
+        System.out.println("Get list objects successfully from "+ret.getClass().toString());
         return ret;
     }
 

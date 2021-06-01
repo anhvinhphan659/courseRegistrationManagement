@@ -29,7 +29,8 @@ public class SubjectDAO
     public SubjectEntity getObject(String ID)
     {
         SubjectEntity ret;
-        tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         ret=session.get(SubjectEntity.class,ID);
         return ret;
     }
@@ -37,7 +38,8 @@ public class SubjectDAO
     public void saveObject(SubjectEntity subject)
     {
         if(subject!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
 
             session.save(subject);
             tx.commit();
@@ -46,7 +48,8 @@ public class SubjectDAO
     public void removeObject(SubjectEntity subject)
     {
         if(subject!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.delete(subject);
             tx.commit();
         }
@@ -59,18 +62,20 @@ public class SubjectDAO
         {
             removeObject(subject);
             subject.setSubjectid(newID);
-            Transaction tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.save(subject);
             tx.commit();
 
         }
     }
-    public List<SubjectEntity> getListObject()
+    public List<SubjectEntity> getListObjects()
     {
         String hql="FROM SubjectEntity";
 
         Query data= session.createQuery(hql);
         List<SubjectEntity> ret=data.list();
+        System.out.println("Get list objects successfully from "+ret.getClass().toString());
         return ret;
     }
 

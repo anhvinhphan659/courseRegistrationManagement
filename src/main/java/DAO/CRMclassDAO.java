@@ -11,8 +11,8 @@ import org.hibernate.Transaction;
 
 public class CRMclassDAO
 {
-    private Session session;
-    private Transaction tx;
+    private static Session session;
+    private static Transaction tx;
 
     public CRMclassDAO()
     {
@@ -22,13 +22,14 @@ public class CRMclassDAO
             session=current;
         else
             session=hb.getSessionfactory().openSession();
+
     }
 
 
     public void saveObject(CrmclassEntity crmclass)
     {
 
-        Transaction tx=session.beginTransaction();
+
         session.save(crmclass);
         tx.commit();
 
@@ -38,7 +39,8 @@ public class CRMclassDAO
     {
         CrmclassEntity ret;
 
-        Transaction tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         ret=session.load(CrmclassEntity.class,id);
         tx.commit();
         return ret;
@@ -46,7 +48,8 @@ public class CRMclassDAO
 
     public List<CrmclassEntity> getObjects(int male)
     {
-        tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         String query= "from CrmclassEntity c where c.male= " + String.valueOf(male);
         Query data=session.createQuery(query);
         List<CrmclassEntity> ret=data.list();
@@ -61,7 +64,8 @@ public class CRMclassDAO
         {
             removeObject(crmclass);
             crmclass.setClassid(newID);
-            Transaction tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.save(crmclass);
             tx.commit();
 
@@ -73,7 +77,8 @@ public class CRMclassDAO
         if(obj!=null)
         {
             obj.setMale(newMale);
-            tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.update(obj);
             tx.commit();
         }
@@ -84,7 +89,8 @@ public class CRMclassDAO
         if(obj!=null)
         {
             obj.setFemale(newFeMale);
-            tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.update(obj);
             tx.commit();
         }
@@ -94,7 +100,8 @@ public class CRMclassDAO
         if(obj!=null)
         {
             obj.setYearstart(newYearStart);
-            tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.update(obj);
             tx.commit();
         }
@@ -105,7 +112,8 @@ public class CRMclassDAO
         if(obj!=null)
         {
             obj.setYearend(newYearEnd);
-            tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.update(obj);
             tx.commit();
         }
@@ -113,16 +121,19 @@ public class CRMclassDAO
 
     public void removeObject(CrmclassEntity delObj)
     {
-        tx= session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         session.delete(delObj);
         tx.commit();
     }
-    public List<CrmclassEntity> getListObject()
+    public List<CrmclassEntity> getListObjects()
     {
         String hql="FROM CrmclassEntity";
 
+
         Query data= session.createQuery(hql);
         List<CrmclassEntity> ret=data.list();
+        System.out.println("Get list objects successfully from "+ret.getClass().toString());
         return ret;
     }
 

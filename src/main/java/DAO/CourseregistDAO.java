@@ -24,7 +24,8 @@ public class CourseregistDAO
     public CourseregistEntity getObject(String ID)
     {
         CourseregistEntity ret;
-        tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         ret=session.get(CourseregistEntity.class,ID);
         return ret;
     }
@@ -32,7 +33,8 @@ public class CourseregistDAO
     public void saveObject(CourseregistEntity courseregist)
     {
         if(courseregist!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
 
             session.save(courseregist);
             tx.commit();
@@ -42,7 +44,8 @@ public class CourseregistDAO
     public void removeObject(CourseregistEntity courseregist)
     {
         if(courseregist!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.delete(courseregist);
             tx.commit();
         }
@@ -55,7 +58,8 @@ public class CourseregistDAO
         {
             removeObject(courseregist);
             courseregist.setIdregister(newID);
-            Transaction tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.save(courseregist);
             tx.commit();
 

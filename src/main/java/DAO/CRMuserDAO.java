@@ -23,12 +23,14 @@ public class CRMuserDAO
             session=current;
         else
             session=hb.getSessionfactory().openSession();
-
+        if(session.getTransaction()==null)
+            tx=session.beginTransaction();
     }
 
     public void saveObject(CrmuserEntity crmuser)
     {
-        Transaction tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         session.save(crmuser);
         tx.commit();
 
@@ -37,14 +39,16 @@ public class CRMuserDAO
     public CrmuserEntity getObject(String userID)
     {
         CrmuserEntity ret;
-        tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         ret=session.get(CrmuserEntity.class,userID);
         return ret;
     }
 
     public void removeObject(CrmuserEntity crmuser)
     {
-        Transaction tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         session.delete(crmuser);
         tx.commit();
     }
@@ -63,12 +67,14 @@ public class CRMuserDAO
         }
     }
 
-    public List<CrmuserEntity> getListObject()
+    public List<CrmuserEntity> getListObjects()
     {
         String hql="FROM CrmuserEntity";
-
+        if(tx==null)
+            tx = session.beginTransaction();
         Query data= session.createQuery(hql);
         List<CrmuserEntity> ret=data.list();
+        System.out.println("Get list objects successfully from "+ret.getClass().toString());
         return ret;
     }
 
@@ -84,12 +90,34 @@ public class CRMuserDAO
                 ret.add(add);
             }
             return ret.toArray(new Object[0][]);
-
         }
         return null;
     }
 
+    public int checkAccount(String acc,String pas)
+    {
+        String hql= "FROM CrmuserEntity c WHERE c.account=: accoun";
 
+        tx=session.beginTransaction();
+        System.out.println(session.toString());
+        System.out.println(tx.toString());
+        Query query=session.createQuery(hql);
+        query.setParameter("accoun",acc);
+        List<CrmuserEntity>result=query.list();
+        System.out.println(result);
+        if(result==null||result.size()==0) {
+            return -1;
+        }
+        CrmuserEntity data= (CrmuserEntity) query.list().get(0);
+        if (data.getPass().compareTo(pas)==0)
+        {
+            if(data.getIsadmin()==true)
+                return 2;
+            else
+                return 1;
+        }
+        return 0;
+    }
 
 
 

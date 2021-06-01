@@ -1,11 +1,15 @@
 package DAO;
 import HibernateUtil.hibernateUtil;
+import POJO.CourseopenEntity;
 import POJO.CrmuserEntity;
 import  POJO.StudentEntity;
 
 import HibernateUtil.hibernateUtil;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.util.List;
 
 public class StudentDAO
 {
@@ -24,7 +28,8 @@ public class StudentDAO
     public StudentEntity getObject(String ID)
     {
         StudentEntity ret;
-        tx=session.beginTransaction();
+        if(tx==null)
+            tx = session.beginTransaction();
         ret=session.get(StudentEntity.class,ID);
         return ret;
     }
@@ -32,7 +37,8 @@ public class StudentDAO
     public void saveObject(StudentEntity student)
     {
         if(student!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
 
             session.save(student);
             tx.commit();
@@ -42,7 +48,8 @@ public class StudentDAO
     public void removeObject(StudentEntity student)
     {
         if(student!=null) {
-            tx = session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.delete(student);
             tx.commit();
         }
@@ -55,10 +62,20 @@ public class StudentDAO
         {
             removeObject(student);
             student.setStudentid(newID);
-            Transaction tx=session.beginTransaction();
+            if(tx==null)
+                tx = session.beginTransaction();
             session.save(student);
             tx.commit();
 
         }
+    }
+    public List<StudentEntity> getListObjects()
+    {
+        String hql="FROM StudentEntity ";
+
+
+        Query data= session.createQuery(hql);
+        List<StudentEntity> ret=data.list();
+        return ret;
     }
 }

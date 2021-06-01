@@ -33,7 +33,20 @@ public class Main
 //        test.setUserid("ST19120680");
 //
 //        studdao.saveObject(test);
-    MainUI mainUI=new MainUI();
-    mainUI.setUpMain();
+//        CRMuserDAO userdao=new CRMuserDAO();
+//        CrmuserEntity data= userdao.getObject("ST19120721");
+//        System.out.println(data.toString());
+//        System.out.println(userdao.getListObject().size());
+//        Object[][]ret=CRMuserDAO.convertToObject(userdao.getListObject());
+//        System.out.println(ret.length);
+        AcademicUI acaui=new AcademicUI();
+        acaui.setUpDisplay();
+//
+
+//        CRMuserDAO crMuserDAO=new CRMuserDAO();
+//                       int res= crMuserDAO.checkAccount("sa","123456");
+//       System.out.println(res);
     }
+
+
 }
