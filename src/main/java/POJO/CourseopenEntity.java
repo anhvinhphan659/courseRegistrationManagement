@@ -1,11 +1,12 @@
 package POJO;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "courseopen", schema = "public", catalog = "crmdata")
 public class CourseopenEntity {
-    private String openid; //openid = subjectid+courseclass
+    private String openid;
     private String subjectid;
     private String courseclass;
     private Integer beginshift;
@@ -13,6 +14,7 @@ public class CourseopenEntity {
     private Integer diw;
     private String teacher;
     private Integer maxtotal;
+    private String semsesid;
 
     @Id
     @Column(name = "openid")
@@ -31,7 +33,7 @@ public class CourseopenEntity {
     }
 
     public void setSubjectid(String subjectid) {
-        openid=subjectid+courseclass;
+        this.subjectid = subjectid;
     }
 
     @Basic
@@ -42,7 +44,6 @@ public class CourseopenEntity {
 
     public void setCourseclass(String courseclass) {
         this.courseclass = courseclass;
-        openid=subjectid+courseclass;
     }
 
     @Basic
@@ -95,35 +96,26 @@ public class CourseopenEntity {
         this.maxtotal = maxtotal;
     }
 
+    @Basic
+    @Column(name = "semsesid")
+    public String getSemsesid() {
+        return semsesid;
+    }
+
+    public void setSemsesid(String semsesid) {
+        this.semsesid = semsesid;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         CourseopenEntity that = (CourseopenEntity) o;
-
-        if (openid != null ? !openid.equals(that.openid) : that.openid != null) return false;
-        if (subjectid != null ? !subjectid.equals(that.subjectid) : that.subjectid != null) return false;
-        if (courseclass != null ? !courseclass.equals(that.courseclass) : that.courseclass != null) return false;
-        if (beginshift != null ? !beginshift.equals(that.beginshift) : that.beginshift != null) return false;
-        if (endshift != null ? !endshift.equals(that.endshift) : that.endshift != null) return false;
-        if (diw != null ? !diw.equals(that.diw) : that.diw != null) return false;
-        if (teacher != null ? !teacher.equals(that.teacher) : that.teacher != null) return false;
-        if (maxtotal != null ? !maxtotal.equals(that.maxtotal) : that.maxtotal != null) return false;
-
-        return true;
+        return Objects.equals(openid, that.openid) && Objects.equals(subjectid, that.subjectid) && Objects.equals(courseclass, that.courseclass) && Objects.equals(beginshift, that.beginshift) && Objects.equals(endshift, that.endshift) && Objects.equals(diw, that.diw) && Objects.equals(teacher, that.teacher) && Objects.equals(maxtotal, that.maxtotal) && Objects.equals(semsesid, that.semsesid);
     }
 
     @Override
     public int hashCode() {
-        int result = openid != null ? openid.hashCode() : 0;
-        result = 31 * result + (subjectid != null ? subjectid.hashCode() : 0);
-        result = 31 * result + (courseclass != null ? courseclass.hashCode() : 0);
-        result = 31 * result + (beginshift != null ? beginshift.hashCode() : 0);
-        result = 31 * result + (endshift != null ? endshift.hashCode() : 0);
-        result = 31 * result + (diw != null ? diw.hashCode() : 0);
-        result = 31 * result + (teacher != null ? teacher.hashCode() : 0);
-        result = 31 * result + (maxtotal != null ? maxtotal.hashCode() : 0);
-        return result;
+        return Objects.hash(openid, subjectid, courseclass, beginshift, endshift, diw, teacher, maxtotal, semsesid);
     }
 }
