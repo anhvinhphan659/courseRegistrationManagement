@@ -89,4 +89,21 @@ public class StudentEntity {
         result = 31 * result + (userid != null ? userid.hashCode() : 0);
         return result;
     }
+
+    public StudentEntity()
+    {
+
+    }
+    public StudentEntity(Object[]data)
+    {
+        if(data.length==4)
+        {
+            studentid=(String) data[0];
+            studentname=(String) data[1];
+            gender=(Boolean) data[2];
+            classid=(String) data[3];
+            userid="ST"+studentid;
+        }
+    }
+
 }

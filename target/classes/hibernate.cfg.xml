@@ -19,6 +19,8 @@
         <mapping class="POJO.SemesterEntity"/>
         <mapping class="POJO.StudentEntity"/>
         <mapping class="POJO.SubjectEntity"/>
+        <mapping class="POJO.SemesterEntity"/>
+        <mapping class="POJO.SemestersessionEntity"/>
 
 
     </session-factory>

@@ -11,12 +11,12 @@ import org.hibernate.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SemesterSessionDao
+public class SemesterSessionDAO
 {
     private static Session session;
     private static Transaction tx;
 
-    SemesterSessionDao()
+    public SemesterSessionDAO()
     {
         hibernateUtil hb=new hibernateUtil();
         Session current=hb.getSessionfactory().getCurrentSession();
@@ -28,6 +28,8 @@ public class SemesterSessionDao
 
     public void saveObject(SemestersessionEntity semestersessionEntity)
     {
+        if(tx==null)
+            tx = session.beginTransaction();
         session.save(semestersessionEntity);
         tx.commit();
     }
@@ -53,9 +55,8 @@ public class SemesterSessionDao
 
     public List<SemestersessionEntity> getListObjects()
     {
-        String hql="FROM SemestersessionEntity ";
-        if(tx==null)
-            tx = session.beginTransaction();
+        String hql="FROM SemestersessionEntity";
+
         Query data= session.createQuery(hql);
         List<SemestersessionEntity> ret=data.list();
         System.out.println("Get list objects successfully from "+ret.getClass().toString());

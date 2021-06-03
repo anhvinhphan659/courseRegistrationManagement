@@ -1,5 +1,7 @@
 package POJO;
 
+import UI.AcademicUI;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -117,5 +119,25 @@ public class CourseopenEntity {
     @Override
     public int hashCode() {
         return Objects.hash(openid, subjectid, courseclass, beginshift, endshift, diw, teacher, maxtotal, semsesid);
+    }
+
+    public CourseopenEntity()
+    {
+
+    }
+    public CourseopenEntity(Object[] data)
+    {
+        if(data.length==7)
+        {
+            subjectid=(String) data[0];
+            courseclass=(String)data[1];
+            beginshift=new Integer((String)data[2]);
+            endshift=new Integer((String) data[3]);
+            diw=new Integer((String) data[4]);
+            teacher=(String)data[5];
+            maxtotal=new Integer((String) data[6]);
+            semsesid= AcademicUI.getCurrentSemester();
+            openid=subjectid+semsesid;
+        }
     }
 }

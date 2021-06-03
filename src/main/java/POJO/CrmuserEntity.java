@@ -83,6 +83,16 @@ public class CrmuserEntity {
 
     }
 
+    public CrmuserEntity(Object[] data)
+    {
+        if(data.length==4)
+        {
+            userid=(String) data[0];
+            account=(String)data[1];
+            pass=(String) data[2];
+            isadmin=(Boolean) data[3];
+        }
+    }
     @Override
     public String toString() {
         return "CrmuserEntity{" +

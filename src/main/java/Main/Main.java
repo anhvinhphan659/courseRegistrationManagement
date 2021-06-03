@@ -1,10 +1,9 @@
 package Main;
 
-import DAO.CRMclassDAO;
-import DAO.CRMuserDAO;
-import DAO.StudentDAO;
+import DAO.*;
 import POJO.CrmclassEntity;
 import POJO.CrmuserEntity;
+import POJO.SemestersessionEntity;
 import POJO.StudentEntity;
 import UI.*;
 import java.util.List;
@@ -41,8 +40,14 @@ public class Main
 //        System.out.println(ret.length);
         AcademicUI acaui=new AcademicUI();
         acaui.setUpDisplay();
-//
 
+//        SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
+//        SemestersessionEntity test=new SemestersessionEntity();
+//        test.setSemsesid("test");
+//        semesterSessionDAO.saveObject(test);
+//
+//        StudentUI studentUI=new StudentUI();
+//        studentUI.setUpDisplay();
 //        CRMuserDAO crMuserDAO=new CRMuserDAO();
 //                       int res= crMuserDAO.checkAccount("sa","123456");
 //       System.out.println(res);

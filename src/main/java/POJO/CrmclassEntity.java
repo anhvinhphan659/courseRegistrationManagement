@@ -97,4 +97,20 @@ public class CrmclassEntity {
         result = 31 * result + (yearend != null ? yearend.hashCode() : 0);
         return result;
     }
+
+    public CrmclassEntity()
+    {
+
+    }
+    public CrmclassEntity(Object[] data)
+    {
+        if(data.length==5)
+        {
+            classid=(String) data[0];
+            male=Integer.valueOf((String) data[1]);
+            female=Integer.valueOf((String) data[2]);
+            yearstart=Integer.valueOf((String) data[3]);
+            yearend=Integer.valueOf((String) data[4]);
+        }
+    }
 }

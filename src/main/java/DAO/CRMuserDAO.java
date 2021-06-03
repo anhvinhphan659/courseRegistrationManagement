@@ -29,8 +29,7 @@ public class CRMuserDAO
 
     public void saveObject(CrmuserEntity crmuser)
     {
-        if(tx==null)
-            tx = session.beginTransaction();
+        tx = session.beginTransaction();
         session.save(crmuser);
         tx.commit();
 

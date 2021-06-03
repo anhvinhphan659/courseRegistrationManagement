@@ -1,5 +1,7 @@
 package POJO;
 
+import DAO.SubjectDAO;
+
 import javax.persistence.*;
 
 @Entity
@@ -63,6 +65,22 @@ public class SubjectEntity {
         if (falculty != null ? !falculty.equals(that.falculty) : that.falculty != null) return false;
 
         return true;
+    }
+
+    public SubjectEntity()
+    {
+
+    }
+
+    public SubjectEntity(Object[] data)
+    {
+        if(data.length==4)
+        {
+            subjectid=(String) data[0];
+            subjectname=(String) data[1];
+            credit=new Integer((String) data[2]);
+            falculty=(String) data[3];
+        }
     }
 
     @Override

@@ -15,7 +15,7 @@ public class SemesterDAO
     private static Session session;
     private static Transaction tx;
 
-    SemesterDAO()
+    public SemesterDAO()
     {
         hibernateUtil hb=new hibernateUtil();
         Session current=hb.getSessionfactory().getCurrentSession();
@@ -52,8 +52,7 @@ public class SemesterDAO
     public List<SemesterEntity> getListObjects()
     {
         String hql="FROM SemesterEntity ";
-        if(tx==null)
-            tx = session.beginTransaction();
+
         Query data= session.createQuery(hql);
         List<SemesterEntity> ret=data.list();
         System.out.println("Get list objects successfully from "+ret.getClass().toString());

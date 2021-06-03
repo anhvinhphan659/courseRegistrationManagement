@@ -29,7 +29,7 @@ public class CRMclassDAO
     public void saveObject(CrmclassEntity crmclass)
     {
 
-
+    tx=session.beginTransaction();
         session.save(crmclass);
         tx.commit();
 

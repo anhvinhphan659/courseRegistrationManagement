@@ -2,7 +2,6 @@ package UI;
 
 import javax.swing.*;
 import DAO.*;
-import POJO.CrmuserEntity;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,14 +11,18 @@ import java.util.List;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.stream.Collectors;
 
 public class AcademicUI
 {
     private JFrame mainframe;
-    private Object[][] courseTableData;
-    private Object[][] userTableData;
-    private Object[][] subjectTableData;
-    private Object[][] classTableData;
+    private static Object[][] courseTableData;
+    private static Object[][] userTableData;
+    private static Object[][] subjectTableData;
+    private static Object[][] classTableData;
+    private static Object[][] studentTableData;
+    private static Object[][] semesterTableData;
+    private static Object[][] semsesTableData;
 
     public AcademicUI()
     {
@@ -30,12 +33,17 @@ public class AcademicUI
         CRMclassDAO crMclassDAO=new CRMclassDAO();
         SubjectDAO subjectDAO=new SubjectDAO();
         CourseOpenDAO courseOpenDAO=new CourseOpenDAO();
+        StudentDAO studentDAO=new StudentDAO();
+        SemesterDAO semesterDAO=new SemesterDAO();
+        SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
 
         userTableData=CRMuserDAO.convertToObject(crMuserDAO.getListObjects());
         classTableData=CRMclassDAO.convertToObject(crMclassDAO.getListObjects());
         subjectTableData=SubjectDAO.convertToObject(subjectDAO.getListObjects());
         courseTableData=CourseOpenDAO.convertToObject(courseOpenDAO.getListObjects());
-
+        studentTableData=StudentDAO.convertToObject(studentDAO.getListObjects());
+        semesterTableData=SemesterDAO.convertToObject(semesterDAO.getListObjects());
+        semsesTableData= SemesterSessionDAO.convertToObject(semesterSessionDAO.getListObjects());
     }
 
     public JFrame getMainframe()
@@ -61,6 +69,7 @@ public class AcademicUI
         JButton subjectButton=new JButton("SUBJECT");
         JButton classButton=new JButton("CLASS");
         JButton courseButton=new JButton("COURSE");
+        JButton semesterButton=new JButton("SEMESTER");
 
         JButton exitButton=new JButton("Exit");
         JLabel emptylabel1=new JLabel();
@@ -75,24 +84,25 @@ public class AcademicUI
         classButton.setBackground(new Color(55,65,55));
         courseButton.setBackground(new Color(55,65,55));
         exitButton.setBackground(new Color(55,65,55));
+        semesterButton.setBackground(new Color(55,65,55));
         accountButton.setForeground(Color.white);
         subjectButton.setForeground(Color.white);
         classButton.setForeground(Color.white);
         courseButton.setForeground(Color.white);
         exitButton.setForeground(Color.white);
+        semesterButton.setForeground(Color.white);
         accountButton.setFont(new Font("Open Sans",Font.BOLD,16));
         subjectButton.setFont(new Font("Open Sans",Font.BOLD,16));
         classButton.setFont(new Font("Open Sans",Font.BOLD,16));
         courseButton.setFont(new Font("Open Sans",Font.BOLD,16));
         exitButton.setFont(new Font("Open Sans",Font.BOLD,16   ));
-
-
-
+        semesterButton.setFont(new Font("Open Sans",Font.BOLD,16   ));
+        //add to leftpanel
         leftPanel.add(accountButton);
         leftPanel.add(subjectButton);
         leftPanel.add(classButton);
         leftPanel.add(courseButton);
-        leftPanel.add(emptylabel1);
+        leftPanel.add(semesterButton);
         leftPanel.add(emptylabel2);
         leftPanel.add(emptylabel3);
         leftPanel.add(exitButton);
@@ -142,6 +152,15 @@ public class AcademicUI
                 mainframe.dispose();
             }
         });
+        semesterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                setUpSemesterDisplay(centerPanel);
+                mainframe.setVisible(true);
+
+            }
+        });
 
 
         //setup for mainframe
@@ -157,6 +176,8 @@ public class AcademicUI
         currentPanel.setLayout(new BorderLayout());
 
         String headerTable[]={"UserID","Account","Password","isAdmin"};
+
+
         //set up data display
         DefaultTableModel df=new DefaultTableModel(userTableData,headerTable);
         JTable accountTable=new JTable(df) {
@@ -181,11 +202,26 @@ public class AcademicUI
 //        accountTable.setSize(accountScroll.getWidth()-50,accountScroll.getHeight()-50);
 //        accountScroll.setLayout(null);
 
-        JPanel emptyPanel=new JPanel();
-        emptyPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
-        emptyPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
-        emptyPanel.setBackground(Color.ORANGE);
+        //set up top panel
+        JPanel topPanel =new JPanel();
+        topPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        topPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
+        topPanel.setBackground(Color.ORANGE);
+        topPanel.setLayout(null);
 
+        JLabel searchLabel=new JLabel("Search: ");
+        searchLabel.setBounds(30,50,100,30);
+        JComboBox searchCombo=new JComboBox(headerTable);
+        searchCombo.setBounds(130,50,100,30);
+        JTextField searchTextField=new JTextField();
+        searchTextField.setBounds(230,50,350,30);
+
+        topPanel.add(searchLabel);
+        topPanel.add(searchCombo);
+        topPanel.add(searchTextField);
+
+
+        //set up bottom panel
         JPanel emptyPanel2=new JPanel();
         emptyPanel2.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
         emptyPanel2.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
@@ -237,7 +273,10 @@ public class AcademicUI
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                setUpAdd(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
+
+                Object[] dataSample={"string","string","string",false};
+
+                addActionHandle.setUpAdd(headerTable,dataSample,"Account");
             }
         });
 
@@ -245,7 +284,7 @@ public class AcademicUI
         JPanel contain1=new JPanel();
         JPanel contain2=new JPanel();
         
-        currentPanel.add(emptyPanel,BorderLayout.NORTH);
+        currentPanel.add(topPanel,BorderLayout.NORTH);
         currentPanel.add(accountScroll,BorderLayout.CENTER);
         currentPanel.add(editPanel,BorderLayout.EAST);
         currentPanel.add(emptyPanel2,BorderLayout.SOUTH);
@@ -275,16 +314,32 @@ public class AcademicUI
         subjectScroll.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         subjectScroll.setPreferredSize(new Dimension(currentPanel.getWidth(),250));
 
-        JPanel emptyPanel=new JPanel();
-        emptyPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
-        emptyPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
-        emptyPanel.setBackground(Color.ORANGE);
+        //set up top panel
+        JPanel topPanel=new JPanel();
+        topPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        topPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
+        topPanel.setBackground(Color.ORANGE);
+        topPanel.setLayout(null);
 
+        JLabel searchLabel=new JLabel("Search: ");
+        searchLabel.setBounds(30,50,100,30);
+        JComboBox searchCombo=new JComboBox(headerTable);
+        searchCombo.setBounds(130,50,100,30);
+        JTextField searchTextField=new JTextField();
+        searchTextField.setBounds(230,50,350,30);
+
+        topPanel.add(searchLabel);
+        topPanel.add(searchCombo);
+        topPanel.add(searchTextField);
+
+
+        //set up bottom panel
         JPanel emptyPanel2=new JPanel();
         emptyPanel2.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
         emptyPanel2.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
         emptyPanel2.setBackground(Color.ORANGE);
 
+        //set up editPanel
         JPanel editPanel=new JPanel();
         editPanel.setPreferredSize(new Dimension(100,subjectScroll.getHeight()));
         editPanel.setMaximumSize(new Dimension(100,subjectScroll.getHeight()));
@@ -332,11 +387,12 @@ public class AcademicUI
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                setUpAdd(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
+                Object[] dataSample={"String","String",Integer.valueOf(1),"String"};
+                addActionHandle.setUpAdd(headerTable,dataSample,"Subject");
             }
         });
 
-        currentPanel.add(emptyPanel,BorderLayout.NORTH);
+        currentPanel.add(topPanel,BorderLayout.NORTH);
         currentPanel.add(subjectScroll,BorderLayout.CENTER);
         currentPanel.add(editPanel,BorderLayout.EAST);
         currentPanel.add(emptyPanel2,BorderLayout.SOUTH);
@@ -349,8 +405,20 @@ public class AcademicUI
 
         String headerTable[]={"ClassID","Male","Female","Total","SchoolYear"};
 
+        //set up Table
         DefaultTableModel df=new DefaultTableModel(classTableData,headerTable);
         JTable classTable=new JTable(df)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                //all cells false
+                return false;
+            }
+        };
+
+        String headerTable2[]={"StudentID","Name","Gender","Class",".."};
+        DefaultTableModel df2=new DefaultTableModel(studentTableData,headerTable2);
+        JTable studenTable=new JTable(df2)
         {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -362,13 +430,8 @@ public class AcademicUI
         classTable.setAutoCreateRowSorter(true);
         classTable.setRowHeight(25);
 
-        JScrollPane accountScroll=new JScrollPane(classTable);
-        accountScroll.setBorder(new EtchedBorder(EtchedBorder.RAISED));
-        accountScroll.setPreferredSize(new Dimension(currentPanel.getWidth(),250));
-//        accountTable.setSize(accountScroll.getWidth()-50,accountScroll.getHeight()-50);
-//        accountScroll.setLayout(null);
-
-        JPanel emptyPanel=new JPanel();
+        //set up empty Panel
+        JPanel emptyPanel =new JPanel();
         emptyPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
         emptyPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
         emptyPanel.setBackground(Color.ORANGE);
@@ -378,63 +441,128 @@ public class AcademicUI
         emptyPanel2.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
         emptyPanel2.setBackground(Color.ORANGE);
 
-        JPanel editPanel=new JPanel();
-        editPanel.setPreferredSize(new Dimension(100,accountScroll.getHeight()));
-        editPanel.setMaximumSize(new Dimension(100,accountScroll.getHeight()));
-        editPanel.setBackground(Color.BLUE);
-        JButton addButton=new JButton("ADD");
-        JButton editButton=new JButton("EDIT");
-        JButton removeButton=new JButton("REMOVE");
-        editPanel.setLayout(new GridLayout(12,1,10,10));
-        editPanel.add(addButton);
-        editPanel.add(editButton);
-        editPanel.add(removeButton);
+        //set up scrollpane
+        JScrollPane classScroll=new JScrollPane(classTable);
+
+        JScrollPane studentScroll=new JScrollPane(studenTable);
+
+        //set up classPanel
+        JPanel classPanel =new JPanel();
+        classPanel.setSize(new Dimension(currentPanel.getWidth(),200));
+        classPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),250));
+        classPanel.setLayout(new BorderLayout());
+
+        JPanel funcClassPanel=new JPanel();
+        funcClassPanel.setPreferredSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcClassPanel.setMaximumSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcClassPanel.setLayout(null);
+
+        JLabel searchClassLabel=new JLabel("Search: ");
+        searchClassLabel.setBounds(10,10,100,30);
+        JComboBox searchClassCombo=new JComboBox(headerTable);
+        searchClassCombo.setBounds(110,10,100,30);
+        searchClassCombo.setBackground(Color.WHITE);
+        JTextField searchClassTextField=new JTextField();
+        searchClassTextField.setBounds(210,10,350,30);
+
+        funcClassPanel.add(searchClassLabel);
+        funcClassPanel.add(searchClassCombo);
+        funcClassPanel.add(searchClassTextField);
+
+        JPanel editClassPanel=new JPanel();
+        editClassPanel.setPreferredSize(new Dimension(100,classPanel.getHeight()));
+        editClassPanel.setBackground(Color.BLUE);
+        editClassPanel.setLayout(new GridLayout(5,1,10,10));
+
+        JButton addClassButton=new JButton("Add");
+        JButton editClassButton=new JButton("Edit");
+        JButton removeClassButton =new JButton("Remove");
+
+        editClassPanel.add(addClassButton);
+        editClassPanel.add(editClassButton);
+        editClassPanel.add(removeClassButton);
+
+        classScroll.setPreferredSize(new Dimension(classPanel.getWidth()-100,classPanel.getHeight()-80));
+        classPanel.add(funcClassPanel,BorderLayout.NORTH);
+        classPanel.add(classScroll,BorderLayout.CENTER);
+        classPanel.add(editClassPanel,BorderLayout.EAST);
+
+        //set up StudentPanel
+        JPanel studentPanel=new JPanel();
+        studentPanel.setSize(new Dimension(currentPanel.getWidth(),200));
+        studentPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),250));
+        studentPanel.setLayout(new BorderLayout());
+
+        JPanel funcStudentPanel=new JPanel();
+        funcStudentPanel.setPreferredSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcStudentPanel.setMaximumSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcStudentPanel.setLayout(null);
+
+        JLabel searchStudentLabel=new JLabel("Search: ");
+        searchStudentLabel.setBounds(10,10,100,30);
+        JComboBox searchStudentCombo=new JComboBox(headerTable);
+        searchStudentCombo.setBounds(110,10,100,30);
+        searchStudentCombo.setBackground(Color.WHITE);
+        JTextField searchStudentTextField=new JTextField();
+        searchStudentTextField.setBounds(210,10,350,30);
+
+        funcStudentPanel.add(searchStudentLabel);
+        funcStudentPanel.add(searchStudentCombo);
+        funcStudentPanel.add(searchStudentTextField);
+
+        JPanel editStudentPanel=new JPanel();
+        editStudentPanel.setPreferredSize(new Dimension(100,classPanel.getHeight()));
+        editStudentPanel.setBackground(Color.BLUE);
+        editStudentPanel.setLayout(new GridLayout(5,1,10,10));
+
+        JButton addStudentButton=new JButton("Add");
+        JButton editStudentButton=new JButton("Edit");
+        JButton removeStudentButton =new JButton("Remove");
+
+        editStudentPanel.add(addStudentButton);
+        editStudentPanel.add(editStudentButton);
+        editStudentPanel.add(removeStudentButton);
+
+        studentScroll.setPreferredSize(new Dimension(studentPanel.getWidth()-100,studentPanel.getHeight()-80));
+        studentPanel.add(funcStudentPanel,BorderLayout.NORTH);
+        studentPanel.add(studentScroll,BorderLayout.CENTER);
+        studentPanel.add(editStudentPanel,BorderLayout.EAST);
+
+        //set up centerPanel
+        JPanel centerPanel=new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        centerPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),500));
+
+        centerPanel.add(classPanel,BorderLayout.NORTH);
+        centerPanel.add(studentPanel,BorderLayout.CENTER);
 
         //set up button
-        removeButton.addMouseListener(new MouseAdapter() {
+        addClassButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                int selected=classTable.getSelectedRow();
-                while (selected>=0)
-                {
-                    int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
-                    if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        classTable.setModel(df);
-                        //TODO: delete in database
-
-                    }
-                    selected=classTable.getSelectedRow();
-                }
-
+                String[] header={"ClassID","Male","Female","Year start","Year end"};
+                Object[] datasample={"String",Integer.valueOf(1),Integer.valueOf(1),Integer.valueOf(1),Integer.valueOf(1)};
+                addActionHandle.setUpAdd(header,datasample,"Class");
             }
         });
-        editButton.addMouseListener(new MouseAdapter() {
+
+        addStudentButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                int selected=classTable.getSelectedRow();
-                if(selected>=0)
-                    setUpEdit(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
-                mainframe.setVisible(true);
-            }
-        });
-        addButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                setUpAdd(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
+                String[] header={"StudentID","Name","Gender","ClassID"};
+                Object[] sampleData={"String","String",false,"String"};
+                addActionHandle.setUpAdd(header,sampleData,"Student");
             }
         });
 
-        //set up for class information
-        JComboBox classComboBox=new JComboBox();
-
+        //add to current
+        currentPanel.setLayout(new BorderLayout());
         currentPanel.add(emptyPanel,BorderLayout.NORTH);
-        currentPanel.add(accountScroll,BorderLayout.CENTER);
-        currentPanel.add(editPanel,BorderLayout.EAST);
+        currentPanel.add(centerPanel,BorderLayout.CENTER);
         currentPanel.add(emptyPanel2,BorderLayout.SOUTH);
+
     }
 
     public void setUpCourseDisplay(JPanel currentPanel)
@@ -462,19 +590,32 @@ public class AcademicUI
         JScrollPane accountScroll=new JScrollPane(courseTable);
         accountScroll.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         accountScroll.setPreferredSize(new Dimension(currentPanel.getWidth(),250));
-//        accountTable.setSize(accountScroll.getWidth()-50,accountScroll.getHeight()-50);
-//        accountScroll.setLayout(null);
 
-        JPanel emptyPanel=new JPanel();
-        emptyPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
-        emptyPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
-        emptyPanel.setBackground(Color.ORANGE);
+        //set up top panel
+        JPanel topPanel=new JPanel();
+        topPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        topPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
+        topPanel.setBackground(Color.ORANGE);
+        topPanel.setLayout(null);
 
+        JLabel searchLabel=new JLabel("Search: ");
+        searchLabel.setBounds(30,50,100,30);
+        JComboBox searchCombo=new JComboBox(headerTable);
+        searchCombo.setBounds(130,50,100,30);
+        JTextField searchTextField=new JTextField();
+        searchTextField.setBounds(230,50,350,30);
+
+        topPanel.add(searchLabel);
+        topPanel.add(searchCombo);
+        topPanel.add(searchTextField);
+
+        //set up bottom panel
         JPanel emptyPanel2=new JPanel();
         emptyPanel2.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
         emptyPanel2.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
         emptyPanel2.setBackground(Color.ORANGE);
 
+        //set up edit Panel
         JPanel editPanel=new JPanel();
         editPanel.setPreferredSize(new Dimension(100,accountScroll.getHeight()));
         editPanel.setMaximumSize(new Dimension(100,accountScroll.getHeight()));
@@ -521,14 +662,180 @@ public class AcademicUI
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                setUpAdd(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
+                String[] header={"SubjectID","Class","Begin Shift","End Shift",
+                        "DIW","Teacher","Max Total"};
+                Object[] dataSample={"String","String",Integer.valueOf(1),Integer.valueOf(1),
+                        Integer.valueOf(1),"String",Integer.valueOf(1)};
+                addActionHandle.setUpAdd(header,dataSample,"CourseOpen");
             }
         });
         
-        currentPanel.add(emptyPanel,BorderLayout.NORTH);
+        currentPanel.add(topPanel,BorderLayout.NORTH);
         currentPanel.add(accountScroll,BorderLayout.CENTER);
         currentPanel.add(editPanel,BorderLayout.EAST);
         currentPanel.add(emptyPanel2,BorderLayout.SOUTH);
+    }
+
+    public void setUpSemesterDisplay(JPanel currentPanel)
+    {
+        currentPanel.removeAll();
+        currentPanel.setLayout(new BorderLayout());
+
+        String headerTable[]={"ID","Name","Year","Date begin","Date end","Is current year"};
+
+        //set up Table
+        DefaultTableModel df=new DefaultTableModel(semesterTableData,headerTable);
+        JTable semesterTable=new JTable(df)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                //all cells false
+                return false;
+            }
+        };
+
+        String headerTable2[]={"SemsesID","SemesterID","Date begin","Date end"};
+        DefaultTableModel df2=new DefaultTableModel(semsesTableData,headerTable2);
+        JTable studenTable=new JTable(df2)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                //all cells false
+                return false;
+            }
+        };
+
+        semesterTable.setAutoCreateRowSorter(true);
+        semesterTable.setRowHeight(25);
+
+        //set up empty Panel
+        JPanel emptyPanel =new JPanel();
+        emptyPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        emptyPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
+        emptyPanel.setBackground(Color.ORANGE);
+
+        JPanel emptyPanel2=new JPanel();
+        emptyPanel2.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        emptyPanel2.setMaximumSize(new Dimension(currentPanel.getWidth(),150));
+        emptyPanel2.setBackground(Color.ORANGE);
+
+        //set up scrollpane
+        JScrollPane semesterScroll=new JScrollPane(semesterTable);
+
+        JScrollPane semesterSessionScroll=new JScrollPane(studenTable);
+
+        //set up semester Panel
+        JPanel semesterPanel =new JPanel();
+        semesterPanel.setSize(new Dimension(currentPanel.getWidth(),200));
+        semesterPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),250));
+        semesterPanel.setLayout(new BorderLayout());
+
+        JPanel funcSemesterPanel=new JPanel();
+        funcSemesterPanel.setPreferredSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcSemesterPanel.setMaximumSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcSemesterPanel.setLayout(null);
+
+        JLabel searchSemesterLabel=new JLabel("Search: ");
+        searchSemesterLabel.setBounds(10,10,100,30);
+        JComboBox searchSemesterCombo=new JComboBox(headerTable);
+        searchSemesterCombo.setBounds(110,10,100,30);
+        searchSemesterCombo.setBackground(Color.WHITE);
+        JTextField searchSemesterTextField=new JTextField();
+        searchSemesterTextField.setBounds(210,10,350,30);
+
+        funcSemesterPanel.add(searchSemesterLabel);
+        funcSemesterPanel.add(searchSemesterCombo);
+        funcSemesterPanel.add(searchSemesterTextField);
+
+        JPanel editSemesterPanel=new JPanel();
+        editSemesterPanel.setPreferredSize(new Dimension(100,semesterPanel.getHeight()));
+        editSemesterPanel.setBackground(Color.BLUE);
+        editSemesterPanel.setLayout(new GridLayout(5,1,10,10));
+
+        JButton addSemesterButton=new JButton("Add");
+        JButton editSemesterButton=new JButton("Edit");
+        JButton removeSemesterButton=new JButton("Remove");
+
+        editSemesterPanel.add(addSemesterButton);
+        editSemesterPanel.add(editSemesterButton);
+        editSemesterPanel.add(removeSemesterButton);
+
+        JPanel bottomSemesterPanel=new JPanel();
+        bottomSemesterPanel.setPreferredSize(new Dimension(semesterPanel.getWidth()-100,80));
+        bottomSemesterPanel.setLayout(null);
+
+        JLabel setSemesterLabel=new JLabel("Set current semester:");
+        setSemesterLabel.setBounds(10,10,200,50);
+        String[] idData={"Test1","Test2"};
+        JComboBox semesterIDCombo=new JComboBox(idData);
+        semesterIDCombo.setBounds(210,10,100,50);
+        JButton setButton=new JButton("Set");
+        setButton.setBounds(310,10,100,50);
+
+        bottomSemesterPanel.add(setSemesterLabel);
+        bottomSemesterPanel.add(semesterIDCombo);
+        bottomSemesterPanel.add(setButton);
+
+        semesterScroll.setPreferredSize(new Dimension(semesterPanel.getWidth()-100,semesterPanel.getHeight()-80));
+        semesterPanel.add(funcSemesterPanel,BorderLayout.NORTH);
+        semesterPanel.add(semesterScroll,BorderLayout.CENTER);
+        semesterPanel.add(editSemesterPanel,BorderLayout.EAST);
+        semesterPanel.add(bottomSemesterPanel,BorderLayout.SOUTH);
+
+        //set up Semester Session Panel
+        JPanel semesterSessionPanel=new JPanel();
+        semesterSessionPanel.setSize(new Dimension(currentPanel.getWidth(),200));
+        semesterSessionPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),250));
+        semesterSessionPanel.setLayout(new BorderLayout());
+
+        JPanel funcSemsesPanel=new JPanel();
+        funcSemsesPanel.setPreferredSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcSemsesPanel.setMaximumSize(new Dimension(currentPanel.getWidth()-100,50));
+        funcSemsesPanel.setLayout(null);
+
+        JLabel searchSemsesLabel=new JLabel("Search: ");
+        searchSemsesLabel.setBounds(10,10,100,30);
+        JComboBox searchSemesCombo=new JComboBox(headerTable2);
+        searchSemesCombo.setBounds(110,10,100,30);
+        searchSemesCombo.setBackground(Color.WHITE);
+        JTextField searchSemsesTextField=new JTextField();
+        searchSemsesTextField.setBounds(210,10,350,30);
+
+        funcSemsesPanel.add(searchSemsesLabel);
+        funcSemsesPanel.add(searchSemesCombo);
+        funcSemsesPanel.add(searchSemsesTextField);
+
+        JPanel editSemsesPanel=new JPanel();
+        editSemsesPanel.setPreferredSize(new Dimension(100,semesterPanel.getHeight()));
+        editSemsesPanel.setBackground(Color.BLUE);
+        editSemesterPanel.setLayout(new GridLayout(5,1,10,10));
+
+        JButton addSemsesButton=new JButton("Add");
+        JButton editSemsesButton=new JButton("Edit");
+        JButton removeSemsesButton=new JButton("Remove");
+
+        editSemsesPanel.add(addSemsesButton);
+        editSemsesPanel.add(editSemsesButton);
+        editSemsesPanel.add(removeSemsesButton);
+
+        semesterSessionScroll.setPreferredSize(new Dimension(semesterSessionPanel.getWidth()-100,semesterSessionPanel.getHeight()-80));
+        semesterSessionPanel.add(funcSemsesPanel,BorderLayout.NORTH);
+        semesterSessionPanel.add(semesterSessionScroll,BorderLayout.CENTER);
+        semesterSessionPanel.add(editSemsesPanel,BorderLayout.EAST);
+
+        //set up centerPanel
+        JPanel centerPanel=new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        centerPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),500));
+
+        centerPanel.add(semesterPanel,BorderLayout.NORTH);
+        centerPanel.add(semesterSessionPanel,BorderLayout.CENTER);
+        //add to current
+        currentPanel.setLayout(new BorderLayout());
+        currentPanel.add(emptyPanel,BorderLayout.NORTH);
+        currentPanel.add(centerPanel,BorderLayout.CENTER);
+        currentPanel.add(emptyPanel2,BorderLayout.SOUTH);
+
     }
 
     public void setUpEdit(String[]labelData,Object[]data,String CMD)
@@ -580,7 +887,7 @@ public class AcademicUI
         editFrame.setVisible(true);
     }
 
-    public void setUpAdd(String[]labelData,Object[]data,String CMD)
+    private void setUpAdd(String[]labelData,Object[]data,String CMD)
     {
         System.out.println("Setting up add"+CMD);
         JFrame addFrame=new JFrame("Add "+CMD);
@@ -603,9 +910,19 @@ public class AcademicUI
         }
         for(int i=0;i<len;i++)
         {
-            JTextField curTextField=new JTextField();
-            curTextField.setText((String) data[i]);
-            addPanel.add(curTextField);
+
+
+            if(data[i].getClass()==Boolean.class)
+            {
+                JCheckBox checkBox=new JCheckBox();
+                checkBox.setSelected((Boolean) data[i]);
+                addPanel.add(checkBox);
+            }
+            else {
+                JTextField curTextField = new JTextField();
+                curTextField.setText((String) data[i]);
+                addPanel.add(curTextField);
+            }
         }
 
         JPanel confirmPanel=new JPanel();
@@ -625,46 +942,21 @@ public class AcademicUI
                 //TODO: do sth with database
             }
         });
-
         addFrame.setVisible(true);
     }
 
-}
-
-class handleData
-{
-    public static Object[][] getDatawithState(Object[][]data,int boolColumn,Boolean val)
+    public static String getCurrentSemester()
     {
-        Object[][] ret;
-        List<Object[]> listData=Arrays.asList(data);
-        List<Object[]> listRet=new ArrayList<>();
-        for(int i=0;i<listData.size();i++)
+        int len=semesterTableData.length;
+        String ret="None";
+        for(int i=0;i<len;i++)
         {
-            if(listData.get(i)[boolColumn]==val)
-                listRet.add(listData.get(i));
+            if((Boolean) semesterTableData[i][5]==true)
+                ret=(String) semesterTableData[i][0];
         }
-
-        ret=listRet.toArray(new Object[0][]);
         return ret;
     }
 
-    public static Object[][] removeData(Object[][]data,int row)
-    {
-        Object[][] ret;
-        List<Object[]> listData=Arrays.asList(data);
-        listData.remove(row);
-
-        ret=listData.toArray(new Object[0][]);
-        return ret;
-    }
-
-    public static Object[][] addData(Object[][]data,Object[]newData)
-    {
-        Object[][] ret;
-        List<Object[]> listData=Arrays.asList(data);
-        listData.add(newData);
-
-        ret=listData.toArray(new Object[0][]);
-        return ret;
-    }
 }
+
+

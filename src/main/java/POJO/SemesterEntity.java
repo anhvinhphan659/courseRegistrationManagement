@@ -12,6 +12,7 @@ public class SemesterEntity {
     private Integer yearsemester;
     private Date datebegin;
     private Date dateend;
+    private Boolean iscurrentsemester;
 
     @Id
     @Column(name = "idsemester")
@@ -91,5 +92,15 @@ public class SemesterEntity {
         result = 31 * result + (datebegin != null ? datebegin.hashCode() : 0);
         result = 31 * result + (dateend != null ? dateend.hashCode() : 0);
         return result;
+    }
+
+    @Basic
+    @Column(name = "iscurrentsemester")
+    public Boolean getIscurrentsemester() {
+        return iscurrentsemester;
+    }
+
+    public void setIscurrentsemester(Boolean iscurrentsemester) {
+        this.iscurrentsemester = iscurrentsemester;
     }
 }

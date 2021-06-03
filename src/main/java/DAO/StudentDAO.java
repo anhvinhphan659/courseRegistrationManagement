@@ -1,6 +1,6 @@
 package DAO;
 import HibernateUtil.hibernateUtil;
-import POJO.CourseopenEntity;
+import POJO.StudentEntity;
 import POJO.CrmuserEntity;
 import  POJO.StudentEntity;
 
@@ -9,6 +9,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StudentDAO
@@ -77,5 +78,23 @@ public class StudentDAO
         Query data= session.createQuery(hql);
         List<StudentEntity> ret=data.list();
         return ret;
+    }
+
+    public static Object[][] convertToObject(List<StudentEntity> data)
+    {
+        if(data!=null) {
+            int size = data.size();
+            List<Object[]> ret=new ArrayList<>();
+            for(int i=0;i<size;i++)
+            {
+                StudentEntity temp=data.get(i);
+                Object[] add={temp.getStudentid(),temp.getStudentname(),
+                temp.getGender(),temp.getClassid(),temp.getUserid()};
+                ret.add(add);
+            }
+            return ret.toArray(new Object[0][]);
+
+        }
+        return null;
     }
 }
