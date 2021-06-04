@@ -18,15 +18,19 @@ public class SemesterDAO
     public SemesterDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        Session current=hb.getSessionfactory().getCurrentSession();
-        if(current!=null)
-            session=current;
-        else
-            session=hb.getSessionfactory().openSession();
+        session=hb.getSessionfactory().openSession();
+
+        if(tx==null||tx.isActive()==false)
+        {
+            System.out.println("Initial Transaction at Intialize");
+            tx = session.beginTransaction();
+
+        }
     }
 
     public void saveObject(SemesterEntity semesterEntity)
     {
+        tx= session.beginTransaction();
         session.save(semesterEntity);
         tx.commit();
     }
@@ -35,7 +39,7 @@ public class SemesterDAO
     {
         SemesterEntity ret;
 
-        if(tx==null)
+        if(tx==null|| tx.isActive()==false)
             tx = session.beginTransaction();
         ret=session.load(SemesterEntity.class,ID);
         tx.commit();

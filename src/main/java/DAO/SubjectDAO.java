@@ -19,18 +19,25 @@ public class SubjectDAO
     public SubjectDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        Session current=hb.getSessionfactory().getCurrentSession();
-        if(current!=null)
-            session=current;
-        else
-            session=hb.getSessionfactory().openSession();
+       session=hb.getSessionfactory().openSession();
+
+        if(tx==null||tx.isActive()==false)
+        {
+            System.out.println("Initial Transaction at Intialize");
+            tx = session.beginTransaction();
+
+        }
+
     }
 
     public SubjectEntity getObject(String ID)
     {
         SubjectEntity ret;
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         ret=session.get(SubjectEntity.class,ID);
         return ret;
     }
@@ -38,9 +45,11 @@ public class SubjectDAO
     public void saveObject(SubjectEntity subject)
     {
         if(subject!=null) {
-            if(tx==null)
+            if(tx==null||tx.isActive()==false)
+            {
                 tx = session.beginTransaction();
-
+                System.out.println("Initial Transaction at save");
+            }
             session.save(subject);
             tx.commit();
         }
@@ -72,7 +81,11 @@ public class SubjectDAO
     public List<SubjectEntity> getListObjects()
     {
         String hql="FROM SubjectEntity";
-
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         Query data= session.createQuery(hql);
         List<SubjectEntity> ret=data.list();
         System.out.println("Get list objects successfully from "+ret.getClass().toString());

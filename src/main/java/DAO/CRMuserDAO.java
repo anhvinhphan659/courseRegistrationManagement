@@ -18,18 +18,23 @@ public class CRMuserDAO
     public CRMuserDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        Session current=hb.getSessionfactory().getCurrentSession();
-        if(current!=null)
-            session=current;
-        else
-            session=hb.getSessionfactory().openSession();
-        if(session.getTransaction()==null)
-            tx=session.beginTransaction();
+        session=hb.getSessionfactory().openSession();
+
+        if(tx==null||tx.isActive()==false)
+        {
+            System.out.println("Initial Transaction at Intialize");
+            tx = session.beginTransaction();
+
+        }
     }
 
     public void saveObject(CrmuserEntity crmuser)
     {
-        tx = session.beginTransaction();
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         session.save(crmuser);
         tx.commit();
 
@@ -38,8 +43,12 @@ public class CRMuserDAO
     public CrmuserEntity getObject(String userID)
     {
         CrmuserEntity ret;
-        if(tx==null)
+
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at getObj");
+        }
         ret=session.get(CrmuserEntity.class,userID);
         return ret;
     }
@@ -69,8 +78,10 @@ public class CRMuserDAO
     public List<CrmuserEntity> getListObjects()
     {
         String hql="FROM CrmuserEntity";
-        if(tx==null)
+        if(tx==null) {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at getList");
+        }
         Query data= session.createQuery(hql);
         List<CrmuserEntity> ret=data.list();
         System.out.println("Get list objects successfully from "+ret.getClass().toString());

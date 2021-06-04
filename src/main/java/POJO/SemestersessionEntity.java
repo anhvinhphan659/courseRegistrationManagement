@@ -64,4 +64,30 @@ public class SemestersessionEntity {
     public int hashCode() {
         return Objects.hash(semsesid, idsemester, datebegin, dateend);
     }
+
+    public SemestersessionEntity()
+    {
+
+    }
+    public SemestersessionEntity(Object[]data)
+    {
+        if(data.length==4)
+        {
+            semsesid=(String)data[0];
+            idsemester=(String) data[1];
+            datebegin=convertStringToDate((String) data[2]);
+            dateend=convertStringToDate((String) data[3]);
+
+        }
+    }
+
+    public static Date convertStringToDate(String date)
+    {
+        String[] dates=date.split("/");
+       Date ret=new Date(1,1,1);
+        ret.setDate(Integer.valueOf(dates[0]));
+        ret.setMonth(Integer.valueOf(dates[1])-1);
+        ret.setYear(Integer.valueOf(dates[2])-1900);
+        return ret;
+    }
 }

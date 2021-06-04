@@ -20,11 +20,14 @@ public class CourseOpenDAO
     public CourseOpenDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        Session current=hb.getSessionfactory().getCurrentSession();
-        if(current!=null)
-            session=current;
-        else
-            session=hb.getSessionfactory().openSession();
+        session=hb.getSessionfactory().openSession();
+
+        if(tx==null||tx.isActive()==false)
+        {
+            System.out.println("Initial Transaction at Intialize");
+            tx = session.beginTransaction();
+
+        }
     }
 
     public CourseopenEntity getObject(String ID)

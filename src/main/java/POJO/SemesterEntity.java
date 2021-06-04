@@ -1,8 +1,8 @@
 package POJO;
 
 import javax.persistence.*;
-import javax.sound.midi.spi.MidiFileReader;
 import java.sql.Date;
+
 
 @Entity
 @Table(name = "semester", schema = "public", catalog = "crmdata")
@@ -32,8 +32,7 @@ public class SemesterEntity {
 
     public void setNamesemester(Integer namesemester) {
         this.namesemester = namesemester;
-        Integer year=yearsemester%100;
-        idsemester="SEM_"+namesemester.toString()+"_"+year.toString();
+
     }
 
     @Basic
@@ -44,8 +43,6 @@ public class SemesterEntity {
 
     public void setYearsemester(Integer yearsemester) {
         this.yearsemester = yearsemester;
-        Integer year=yearsemester%100;
-        idsemester="SEM_"+namesemester.toString()+"_"+year.toString();
     }
 
     @Basic
@@ -102,5 +99,30 @@ public class SemesterEntity {
 
     public void setIscurrentsemester(Boolean iscurrentsemester) {
         this.iscurrentsemester = iscurrentsemester;
+    }
+
+    public SemesterEntity()
+    {
+
+    }
+    public SemesterEntity(Object[] data) {
+        if(data.length==5)
+        {
+            idsemester=(String)data[0];
+            namesemester=Integer.valueOf((String) data[1]);
+            yearsemester=Integer.valueOf((String) data[2]);
+            datebegin=convertStringToDate((String) data[3]);
+            dateend=convertStringToDate((String) data[4]);
+        }
+    }
+
+    public static Date convertStringToDate(String date)
+    {
+        String[] dates=date.split("/");
+        Date ret=new Date(1,1,1);
+        ret.setDate(Integer.valueOf(dates[0]));
+        ret.setMonth(Integer.valueOf(dates[1])-1);
+        ret.setYear(Integer.valueOf(dates[2])-1900);
+        return ret;
     }
 }

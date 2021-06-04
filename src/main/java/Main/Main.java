@@ -41,6 +41,7 @@ public class Main
         AcademicUI acaui=new AcademicUI();
         acaui.setUpDisplay();
 
+//        System.out.println("ST19120721".indexOf("ST"));
 //        SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
 //        SemestersessionEntity test=new SemestersessionEntity();
 //        test.setSemsesid("test");
