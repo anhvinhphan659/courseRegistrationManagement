@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +66,7 @@ class addActionHandle
             }
         }
 
+
         JPanel confirmPanel=new JPanel();
         confirmPanel.setPreferredSize(new Dimension(100,addFrame.getHeight()));
         confirmPanel.setMaximumSize(new Dimension(100,addFrame.getHeight()));
@@ -85,25 +87,38 @@ class addActionHandle
                     JOptionPane.showMessageDialog(null,"Please fill full data to process!");
                 }
                 else {
-                    if(CMD.compareTo("Account")==0)
-                        saveData(dataObj,CRMuserDAO.class);
-                    if(CMD.compareTo("Subject")==0)
+                    if(CMD.compareTo("Account")==0) {
+                        saveData(dataObj, CRMuserDAO.class);
+                        JOptionPane.showMessageDialog(null, "Add new user success!");
+                    }
+                    if(CMD.compareTo("Subject")==0) {
                         saveData(dataObj, SubjectDAO.class);
-                    if(CMD.compareTo("CourseOpen")==0)
+                        JOptionPane.showMessageDialog(null,"Add new subject success!");
+                    }
+
+                    if(CMD.compareTo("CourseOpen")==0) {
                         saveData(dataObj, CourseOpenDAO.class);
+                        JOptionPane.showMessageDialog(null,"Add new course success!");
+                    }
                     if(CMD.compareTo("Class")==0)
+                    {
                         saveData(dataObj,CRMclassDAO.class);
-                    if(CMD.compareTo("Student")==0)
+                        JOptionPane.showMessageDialog(null,"Add new class success!");
+                    }
+                    if(CMD.compareTo("Student")==0) {
                         saveData(dataObj, StudentDAO.class);
+                        JOptionPane.showMessageDialog(null,"Add new Student success!");
+                    }
                     if(CMD.compareTo("Semester")==0)
                     {
                         saveData(dataObj,SemesterDAO.class);
+                        JOptionPane.showMessageDialog(null,"Add new Semester success!");
                     }
                     if(CMD.compareTo("Semses")==0)
                     {
                         saveData(dataObj,SemesterSessionDAO.class);
+                        JOptionPane.showMessageDialog(null,"Add new Semester Session success!");
                     }
-                    JOptionPane.showMessageDialog(null,"Add new user success!");
                     addFrame.dispose();
                 }
         }
@@ -167,7 +182,7 @@ class editActionHanle
     {
         System.out.println("Setting up add"+CMD);
         //set up new Frame display to add
-        JFrame editFrame=new JFrame("Add "+CMD);
+        JFrame editFrame=new JFrame("Edit "+CMD);
         editFrame.setDefaultLookAndFeelDecorated(true);
         editFrame.setAlwaysOnTop(true);
         editFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -189,16 +204,33 @@ class editActionHanle
             editPanel.add(curLabel);
         }
 
+        System.out.println(len);
         //create a list to store component create
         java.util.List<Component> dataInput=new ArrayList<>();
         for(int i=0;i<len;i++)
         {
+
             if(data[i].getClass()==Boolean.class)
             {
                 JCheckBox checkBox=new JCheckBox();
                 checkBox.setSelected((Boolean) data[i]);
                 editPanel.add(checkBox);
                 dataInput.add(checkBox);
+            }
+            else if (data[i].getClass()==java.sql.Date.class)
+            {
+                JTextField curTextField = new JTextField();
+                editPanel.add(curTextField);
+                java.sql.Date date=(java.sql.Date)data[i];
+                String day=Integer.valueOf(date.getDate()).toString();
+                String month=Integer.valueOf(date.getMonth()+1).toString();
+                String year=Integer.valueOf(date.getYear()+1900).toString();
+                if(date.getDate()<10)
+                    day="0"+day;
+                if(date.getMonth()+1<10)
+                    month="0"+month;
+                curTextField.setText(year+"-"+month+"-"+day);
+                dataInput.add(curTextField);
             }
             else {
                 JTextField curTextField = new JTextField();
@@ -213,6 +245,7 @@ class editActionHanle
                 dataInput.add(curTextField);
             }
         }
+        System.out.println(dataInput.size());
 
         //disable for ID
         dataInput.get(0).setEnabled(false);
@@ -245,14 +278,42 @@ class editActionHanle
                         editData(dataObj,CRMuserDAO.class);
                         JOptionPane.showMessageDialog(null,"Update user successfully!");
                     }
-                    editFrame.dispose();
                     if(CMD.compareTo("Subject")==0)
                     {
                         editData(dataObj,SubjectDAO.class);
                         JOptionPane.showMessageDialog(null,"Update subject successfully!");
                     }
+                    if(CMD.compareTo("Course")==0)
+                    {
+                        editData(dataObj,CourseOpenDAO.class);
+                        JOptionPane.showMessageDialog(null,"Update Course successfully!");
+                    }
+                    if(CMD.compareTo("Student")==0)
+                    {
+                        dataInput.get(4).setEnabled(false);
+                        editData(dataObj,StudentDAO.class);
+                        JOptionPane.showMessageDialog(null,"Update Student successfully!");
+                    }
+                    if(CMD.compareTo("Class")==0)
+                    {
+                        editData(dataObj,CRMclassDAO.class);
 
+                        JOptionPane.showMessageDialog(null,"Update Class successfully!");
+                    }
+                    if(CMD.compareTo("Semester")==0)
+                    {
+                        editData(dataObj,SemesterDAO.class);
 
+                        JOptionPane.showMessageDialog(null,"Update Semester successfully!");
+                    }
+                    if(CMD.compareTo("SemesterSession")==0)
+                    {
+                        editData(dataObj,SemesterSessionDAO.class);
+
+                        JOptionPane.showMessageDialog(null,"Update Semester successfully!");
+                    }
+
+                    editFrame.dispose();
                 }
             }
         });
@@ -267,16 +328,58 @@ class editActionHanle
             CrmuserEntity obj=crMuserDAO.getObject((String)dataObj[0]);
             obj.setPass((String) dataObj[2]);
             obj.setIsadmin((Boolean) dataObj[3]);
-            crMuserDAO.saveObject(obj);
+            crMuserDAO.updateObject(obj);
         }
         if(SubjectDAO.class.equals(saveClass))
         {
             SubjectDAO subjectDAO=new SubjectDAO();
             SubjectEntity obj=subjectDAO.getObject((String) dataObj[0]);
-            obj.setCredit(Integer.valueOf((String)dataObj[2]));
+            obj.setCredit((Integer)dataObj[2]);
             obj.setSubjectname((String) dataObj[1]);
             obj.setFalculty((String) dataObj[3]);
-            subjectDAO.saveObject(obj);
+            subjectDAO.updateObject(obj);
+        }
+        if(CRMclassDAO.class.equals(saveClass))
+        {
+            CRMclassDAO crMclassDAO=new CRMclassDAO();
+            CrmclassEntity obj=crMclassDAO.getObject((String) dataObj[0]);
+            obj.setMale((Integer)dataObj[1] );
+            obj.setFemale((Integer)dataObj[2] );
+            String schoolYear=(String)dataObj[4];
+            String[] years=schoolYear.split("-");
+            obj.setYearstart(Integer.valueOf(years[0]));
+            obj.setYearend(Integer.valueOf(years[1]));
+            crMclassDAO.updateObject(obj);
+
+        }
+        if(StudentDAO.class.equals(saveClass))
+        {
+            StudentDAO studentDAO=new StudentDAO();
+            StudentEntity obj=studentDAO.getObject((String) dataObj[0]);
+            obj.setStudentname((String) dataObj[1]);
+            obj.setGender((Boolean) dataObj[2]);
+            obj.setClassid((String) dataObj[3]);
+            studentDAO.updateObject(obj);
+        }
+        if(SemesterDAO.class.equals(saveClass))
+        {
+            SemesterDAO semesterDAO=new SemesterDAO();
+            SemesterEntity obj=semesterDAO.getObject((String) dataObj[0]);
+            obj.setNamesemester(Integer.valueOf((String) dataObj[1]));
+            obj.setYearsemester(Integer.valueOf((String) dataObj[2]));
+            obj.setDatebegin(SemestersessionEntity.convertStringToDate((String) dataObj[3]));
+            obj.setDateend(SemestersessionEntity.convertStringToDate((String) dataObj[3]));
+
+            semesterDAO.updateObject(obj);
+        }
+        if(SemesterSessionDAO.class.equals(saveClass))
+        {
+            SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
+            SemestersessionEntity obj=semesterSessionDAO.getObject((String) dataObj[0]);
+            obj.setIdsemester((String)dataObj[1]);
+            obj.setDatebegin((Date)dataObj[2]);
+            obj.setDateend((Date) dataObj[3]);
+            semesterSessionDAO.updateObject(obj);
         }
     }
 }
@@ -293,6 +396,14 @@ class handleData
         }
 
         return ret;
+    }
+    public static Object[] getDataColumn(Object[][]data,int column)
+    {
+        List<Object>ret=new ArrayList<>();
+        int len= data.length;;
+        for(int i=0;i<len;i++)
+            ret.add(data[i][column]);
+        return ret.toArray();
     }
     public static Object[][] filterData(Object[][]origindata, int column, String cur)
     {

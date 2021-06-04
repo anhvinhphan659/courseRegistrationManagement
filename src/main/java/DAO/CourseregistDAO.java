@@ -24,7 +24,6 @@ public class CourseregistDAO
     public CourseregistEntity getObject(String ID)
     {
         CourseregistEntity ret;
-        if(tx==null)
             tx = session.beginTransaction();
         ret=session.get(CourseregistEntity.class,ID);
         return ret;
@@ -33,7 +32,7 @@ public class CourseregistDAO
     public void saveObject(CourseregistEntity courseregist)
     {
         if(courseregist!=null) {
-            if(tx==null)
+
                 tx = session.beginTransaction();
 
             session.save(courseregist);

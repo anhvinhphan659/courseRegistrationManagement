@@ -83,7 +83,14 @@ public class SemestersessionEntity {
 
     public static Date convertStringToDate(String date)
     {
-        String[] dates=date.split("/");
+        String[] dates=date.split("-");
+        String day=dates[2];
+        String month=dates[1];
+        String year=dates[0];
+        if(day.charAt(0)=='0')
+            day=String.valueOf( day.charAt(1));
+        if(month.charAt(0)=='0')
+            month=String.valueOf(month.charAt(1));
        Date ret=new Date(1,1,1);
         ret.setDate(Integer.valueOf(dates[0]));
         ret.setMonth(Integer.valueOf(dates[1])-1);

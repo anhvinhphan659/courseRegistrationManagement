@@ -22,19 +22,21 @@ public class CourseOpenDAO
         hibernateUtil hb=new hibernateUtil();
         session=hb.getSessionfactory().openSession();
 
-        if(tx==null||tx.isActive()==false)
-        {
+
             System.out.println("Initial Transaction at Intialize");
             tx = session.beginTransaction();
 
-        }
+
     }
 
     public CourseopenEntity getObject(String ID)
     {
         CourseopenEntity ret;
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         ret=session.get(CourseopenEntity.class,ID);
         return ret;
     }
@@ -42,8 +44,11 @@ public class CourseOpenDAO
     public void saveObject(CourseopenEntity course)
     {
         if(course!=null) {
-            if(tx==null)
+            if(tx==null||tx.isActive()==false)
+            {
                 tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
 
             session.save(course);
             tx.commit();
@@ -53,8 +58,11 @@ public class CourseOpenDAO
     public void removeObject(CourseopenEntity courseopen)
     {
         if(courseopen!=null) {
-            if(tx==null)
+            if(tx==null||tx.isActive()==false)
+            {
                 tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
             session.delete(courseopen);
             tx.commit();
         }

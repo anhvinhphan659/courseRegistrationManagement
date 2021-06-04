@@ -515,6 +515,7 @@ public class AcademicUI
         JTextField searchClassTextField=new JTextField();
         searchClassTextField.setBounds(210,10,350,30);
 
+
         funcClassPanel.add(searchClassLabel);
         funcClassPanel.add(searchClassCombo);
         funcClassPanel.add(searchClassTextField);
@@ -555,10 +556,14 @@ public class AcademicUI
         searchStudentCombo.setBackground(Color.WHITE);
         JTextField searchStudentTextField=new JTextField();
         searchStudentTextField.setBounds(210,10,350,30);
+        JComboBox classChooseCombo=new JComboBox(handleData.getDataColumn(classTableData,0));
+        classChooseCombo.setBounds(580,10,100,30);
+
 
         funcStudentPanel.add(searchStudentLabel);
         funcStudentPanel.add(searchStudentCombo);
         funcStudentPanel.add(searchStudentTextField);
+        funcStudentPanel.add(classChooseCombo);
 
         JPanel editStudentPanel=new JPanel();
         editStudentPanel.setPreferredSize(new Dimension(100,classPanel.getHeight()));
@@ -651,6 +656,39 @@ public class AcademicUI
                     selected= studenTable.getSelectedRow();
                 }
 
+            }
+        });
+
+        editClassButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int selected=classTable.getSelectedRow();
+                if(selected>=0)
+                {
+                    Object[][] displayData=handleData.toArray(df.getDataVector());
+                    Object[] rowData=displayData[selected];
+
+                    editActionHanle.setUpEdit(headerTable,rowData,"Class");
+                }
+                mainframe.setVisible(true);
+
+            }
+        });
+
+        editStudentButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int selected=studenTable.getSelectedRow();
+                if(selected>=0)
+                {
+                    Object[][] displayData=handleData.toArray(df2.getDataVector());
+                    Object[] rowData=displayData[selected];
+
+                    editActionHanle.setUpEdit(headerTable2,rowData,"Student");
+                }
+                mainframe.setVisible(true);
             }
         });
 
@@ -784,7 +822,12 @@ public class AcademicUI
                 super.mouseClicked(e);
                 int selected=courseTable.getSelectedRow();
                 if(selected>=0)
-                    setUpEdit(new String[]{"TEST1","Tets2"},new Object[]{"data1","data2"},"subject");
+                {
+                    Object[][] displayData=handleData.toArray(df.getDataVector());
+                    Object[] rowData=displayData[selected];
+
+                    editActionHanle.setUpEdit(headerTable,rowData,"Course");
+                }
                 mainframe.setVisible(true);
             }
         });
@@ -832,6 +875,8 @@ public class AcademicUI
         DefaultTableModel df=new DefaultTableModel(semesterTableData,headerTable);
         JTable semesterTable=new JTable(df)
         {
+
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 //all cells false
@@ -843,6 +888,9 @@ public class AcademicUI
         DefaultTableModel df2=new DefaultTableModel(semsesTableData,headerTable2);
         JTable semsesTable=new JTable(df2)
         {
+
+
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 //all cells false
@@ -1046,6 +1094,35 @@ public class AcademicUI
                     selected=semsesTable.getSelectedRow();
                 }
 
+            }
+        });
+        editSemesterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int selected=semesterTable.getSelectedRow();
+                if(selected>=0)
+                {
+                    Object[][] displayData=handleData.toArray(df.getDataVector());
+                    Object[] rowData=displayData[selected];
+
+                    editActionHanle.setUpEdit(headerTable,rowData,"Semester");
+                }
+            }
+        });
+        editSemsesButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int selected=semsesTable.getSelectedRow();
+                if(selected>=0)
+                {
+                    Object[][] displayData=handleData.toArray(df2.getDataVector());
+                    Object[] rowData=displayData[selected];
+
+
+                    editActionHanle.setUpEdit(headerTable2,rowData,"SemesterSession");
+                }
             }
         });
 

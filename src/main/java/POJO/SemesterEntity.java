@@ -118,11 +118,11 @@ public class SemesterEntity {
 
     public static Date convertStringToDate(String date)
     {
-        String[] dates=date.split("/");
+        String[] dates=date.split("-");
         Date ret=new Date(1,1,1);
-        ret.setDate(Integer.valueOf(dates[0]));
+        ret.setDate(Integer.valueOf(dates[2])-1900);
         ret.setMonth(Integer.valueOf(dates[1])-1);
-        ret.setYear(Integer.valueOf(dates[2])-1900);
+        ret.setYear(Integer.valueOf(dates[0]));
         return ret;
     }
 }

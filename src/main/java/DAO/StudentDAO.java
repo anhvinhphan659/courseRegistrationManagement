@@ -21,19 +21,21 @@ public class StudentDAO
         hibernateUtil hb=new hibernateUtil();
         session=hb.getSessionfactory().openSession();
 
-        if(tx==null||tx.isActive()==false)
-        {
+
             System.out.println("Initial Transaction at Intialize");
             tx = session.beginTransaction();
 
-        }
+
     }
 
     public StudentEntity getObject(String ID)
     {
         StudentEntity ret;
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         ret=session.get(StudentEntity.class,ID);
         return ret;
     }
@@ -41,10 +43,29 @@ public class StudentDAO
     public void saveObject(StudentEntity student)
     {
         if(student!=null) {
-            if(tx==null)
+
+            if(tx==null||tx.isActive()==false)
+            {
                 tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
 
             session.save(student);
+            tx.commit();
+        }
+    }
+
+    public void updateObject(StudentEntity student)
+    {
+        if(student!=null) {
+
+            if(tx==null||tx.isActive()==false)
+            {
+                tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
+
+            session.update(student);
             tx.commit();
         }
     }
@@ -52,8 +73,11 @@ public class StudentDAO
     public void removeObject(StudentEntity student)
     {
         if(student!=null) {
-            if(tx==null)
+            if(tx==null||tx.isActive()==false)
+            {
                 tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
             session.delete(student);
             tx.commit();
         }

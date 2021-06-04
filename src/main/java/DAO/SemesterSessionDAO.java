@@ -21,29 +21,46 @@ public class SemesterSessionDAO
         hibernateUtil hb=new hibernateUtil();
         session=hb.getSessionfactory().openSession();
 
-        if(tx==null||tx.isActive()==false)
-        {
+
             System.out.println("Initial Transaction at Intialize");
             tx = session.beginTransaction();
 
-        }
+
     }
+
+
 
     public void saveObject(SemestersessionEntity semestersessionEntity)
     {
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         session.save(semestersessionEntity);
         System.out.println("Save Object success");
         tx.commit();
     }
-
+    public void updateObject(SemestersessionEntity semestersessionEntity)
+    {
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        session.update(semestersessionEntity);
+        System.out.println("Update successfull");
+        tx.commit();
+    }
     public SemestersessionEntity getObject(String ID)
     {
         SemestersessionEntity ret;
 
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         ret=session.load(SemestersessionEntity.class,ID);
         tx.commit();
         return ret;
@@ -51,8 +68,11 @@ public class SemesterSessionDAO
 
     public void removeObject(SemestersessionEntity semestersessionEntity)
     {
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         session.delete(semestersessionEntity);
         tx.commit();
     }

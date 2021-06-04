@@ -19,12 +19,11 @@ public class CRMclassDAO
         hibernateUtil hb=new hibernateUtil();
         session=hb.getSessionfactory().openSession();
 
-        if(tx==null||tx.isActive()==false)
-        {
-            System.out.println("Initial Transaction at Intialize");
-            tx = session.beginTransaction();
 
-        }
+     System.out.println("Initial Transaction at Intialize");
+     tx = session.beginTransaction();
+        System.out.println(session.toString());
+        System.out.println(tx.toString());
 
     }
 
@@ -32,7 +31,13 @@ public class CRMclassDAO
     public void saveObject(CrmclassEntity crmclass)
     {
 
-    tx=session.beginTransaction();
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        System.out.println(session.toString());
+        System.out.println(tx.toString());
         session.save(crmclass);
         tx.commit();
 
@@ -42,17 +47,41 @@ public class CRMclassDAO
     {
         CrmclassEntity ret;
 
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
-        ret=session.load(CrmclassEntity.class,id);
+            System.out.println("Initial Transaction at save");
+        }
+        System.out.println(session.toString());
+        System.out.println(tx.toString());
+        ret=session.get(CrmclassEntity.class,id);
         tx.commit();
         return ret;
     }
 
+    public void updateObject(CrmclassEntity crmclassEntity)
+    {
+
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        System.out.println(session.toString());
+        System.out.println(tx.toString());
+            System.out.println("Initial Transaction at save");
+
+        session.update(crmclassEntity);
+        tx.commit();
+    }
+
     public List<CrmclassEntity> getObjects(int male)
     {
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         String query= "from CrmclassEntity c where c.male= " + String.valueOf(male);
         Query data=session.createQuery(query);
         List<CrmclassEntity> ret=data.list();
@@ -124,8 +153,11 @@ public class CRMclassDAO
 
     public void removeObject(CrmclassEntity delObj)
     {
-        if(tx==null)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         session.delete(delObj);
         tx.commit();
     }

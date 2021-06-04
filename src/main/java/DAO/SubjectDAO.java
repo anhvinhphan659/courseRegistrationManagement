@@ -21,12 +21,10 @@ public class SubjectDAO
         hibernateUtil hb=new hibernateUtil();
        session=hb.getSessionfactory().openSession();
 
-        if(tx==null||tx.isActive()==false)
-        {
+
             System.out.println("Initial Transaction at Intialize");
             tx = session.beginTransaction();
 
-        }
 
     }
 
@@ -45,6 +43,7 @@ public class SubjectDAO
     public void saveObject(SubjectEntity subject)
     {
         if(subject!=null) {
+
             if(tx==null||tx.isActive()==false)
             {
                 tx = session.beginTransaction();
@@ -54,11 +53,25 @@ public class SubjectDAO
             tx.commit();
         }
     }
+    public void updateObject(SubjectEntity subject)
+    {
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        session.update(subject);
+        tx.commit();
+    }
+
     public void removeObject(SubjectEntity subject)
     {
         if(subject!=null) {
-            if(tx==null)
+            if(tx==null||tx.isActive()==false)
+            {
                 tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
             session.delete(subject);
             tx.commit();
         }

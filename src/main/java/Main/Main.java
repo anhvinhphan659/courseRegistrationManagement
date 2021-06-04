@@ -34,6 +34,11 @@ public class Main
 //        studdao.saveObject(test);
 //        CRMuserDAO userdao=new CRMuserDAO();
 //        CrmuserEntity data= userdao.getObject("ST19120721");
+//        data.setPass("hellowrosd");
+//        userdao.updateObject(data);
+//        CrmuserEntity TEST=new CrmuserEntity("1912021");
+//        userdao.saveObject(TEST);
+//        userdao.getObject("1912021");
 //        System.out.println(data.toString());
 //        System.out.println(userdao.getListObject().size());
 //        Object[][]ret=CRMuserDAO.convertToObject(userdao.getListObject());

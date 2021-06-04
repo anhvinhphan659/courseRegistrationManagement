@@ -13,24 +13,27 @@ import java.util.List;
 public class SemesterDAO
 {
     private static Session session;
-    private static Transaction tx;
+    private Transaction tx;
 
     public SemesterDAO()
     {
         hibernateUtil hb=new hibernateUtil();
         session=hb.getSessionfactory().openSession();
 
-        if(tx==null||tx.isActive()==false)
-        {
+
             System.out.println("Initial Transaction at Intialize");
             tx = session.beginTransaction();
 
-        }
     }
 
     public void saveObject(SemesterEntity semesterEntity)
     {
-        tx= session.beginTransaction();
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        System.out.println(tx.toString());
         session.save(semesterEntity);
         tx.commit();
     }
@@ -39,8 +42,12 @@ public class SemesterDAO
     {
         SemesterEntity ret;
 
-        if(tx==null|| tx.isActive()==false)
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        System.out.println(tx.toString());
         ret=session.load(SemesterEntity.class,ID);
         tx.commit();
         return ret;
@@ -48,11 +55,19 @@ public class SemesterDAO
 
     public void removeObject(SemesterEntity semesterEntity)
     {
-        if(tx==null)
+
+        if(tx==null||tx.isActive()==false)
+        {
             tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+
         session.delete(semesterEntity);
         tx.commit();
     }
+
+
+
     public List<SemesterEntity> getListObjects()
     {
         String hql="FROM SemesterEntity ";
@@ -62,7 +77,18 @@ public class SemesterDAO
         System.out.println("Get list objects successfully from "+ret.getClass().toString());
         return ret;
     }
-
+    public void updateObject(SemesterEntity semesterEntity)
+    {
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+        System.out.println(tx.toString());
+        session.update(semesterEntity);
+        System.out.println("Update successs");
+        tx.commit();
+    }
     public static Object[][] convertToObject(List<SemesterEntity>data)
     {
         if(data!=null) {
