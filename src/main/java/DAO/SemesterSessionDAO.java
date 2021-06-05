@@ -68,13 +68,16 @@ public class SemesterSessionDAO
 
     public void removeObject(SemestersessionEntity semestersessionEntity)
     {
-        if(tx==null||tx.isActive()==false)
+        if(semestersessionEntity!=null)
         {
-            tx = session.beginTransaction();
-            System.out.println("Initial Transaction at save");
+            if(tx==null||tx.isActive()==false)
+            {
+                tx = session.beginTransaction();
+                System.out.println("Initial Transaction at save");
+            }
+            session.delete(semestersessionEntity);
+            tx.commit();
         }
-        session.delete(semestersessionEntity);
-        tx.commit();
     }
 
     public List<SemestersessionEntity> getListObjects()

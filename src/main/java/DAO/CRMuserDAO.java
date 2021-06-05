@@ -25,7 +25,9 @@ public class CRMuserDAO
 
     public void saveObject(CrmuserEntity crmuser)
     {
-       session.beginTransaction();
+        if(session.getTransaction()==null)
+            session.beginTransaction();
+
        session.save(crmuser);
        session.getTransaction().commit();
 
@@ -36,7 +38,8 @@ public class CRMuserDAO
     {
         CrmuserEntity ret;
 
-
+        if(session.getTransaction()==null)
+            session.beginTransaction();
 
 session.beginTransaction();
         ret=session.get(CrmuserEntity.class,userID);
@@ -46,13 +49,17 @@ session.beginTransaction();
 
     public void updateObject(CrmuserEntity user)
     {
+        if(session.getTransaction()==null)
+            session.beginTransaction();
         session.update(user);
         session.getTransaction().commit();
     }
 
     public void removeObject(CrmuserEntity crmuser)
     {
-        session.beginTransaction();
+
+        if(session.getTransaction()==null)
+            session.beginTransaction();
         session.delete(crmuser);
         session.getTransaction().commit();
     }

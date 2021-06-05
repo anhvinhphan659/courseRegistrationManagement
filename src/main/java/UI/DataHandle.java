@@ -4,16 +4,15 @@ import DAO.*;
 import POJO.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 public class DataHandle
@@ -312,6 +311,11 @@ class editActionHanle
 
                         JOptionPane.showMessageDialog(null,"Update Semester successfully!");
                     }
+                    if(CMD.compareTo("Course")==0)
+                    {
+                        editData(dataObj,CourseOpenDAO.class);
+                        JOptionPane.showMessageDialog(null,"Update Course successfully!");
+                    }
 
                     editFrame.dispose();
                 }
@@ -325,32 +329,36 @@ class editActionHanle
         if(CRMuserDAO.class.equals(saveClass))
         {
             CRMuserDAO crMuserDAO=new CRMuserDAO();
+
             CrmuserEntity obj=crMuserDAO.getObject((String)dataObj[0]);
             obj.setPass((String) dataObj[2]);
             obj.setIsadmin((Boolean) dataObj[3]);
+
             crMuserDAO.updateObject(obj);
         }
         if(SubjectDAO.class.equals(saveClass))
         {
             SubjectDAO subjectDAO=new SubjectDAO();
+
             SubjectEntity obj=subjectDAO.getObject((String) dataObj[0]);
-            obj.setCredit((Integer)dataObj[2]);
+            obj.setCredit(Integer.valueOf((String) dataObj[2]));
             obj.setSubjectname((String) dataObj[1]);
             obj.setFalculty((String) dataObj[3]);
+
             subjectDAO.updateObject(obj);
         }
         if(CRMclassDAO.class.equals(saveClass))
         {
             CRMclassDAO crMclassDAO=new CRMclassDAO();
             CrmclassEntity obj=crMclassDAO.getObject((String) dataObj[0]);
-            obj.setMale((Integer)dataObj[1] );
-            obj.setFemale((Integer)dataObj[2] );
+            obj.setMale(Integer.valueOf((String) dataObj[1]));
+            obj.setFemale(Integer.valueOf((String) dataObj[1]) );
             String schoolYear=(String)dataObj[4];
             String[] years=schoolYear.split("-");
             obj.setYearstart(Integer.valueOf(years[0]));
             obj.setYearend(Integer.valueOf(years[1]));
-            crMclassDAO.updateObject(obj);
 
+            crMclassDAO.updateObject(obj);
         }
         if(StudentDAO.class.equals(saveClass))
         {
@@ -359,6 +367,7 @@ class editActionHanle
             obj.setStudentname((String) dataObj[1]);
             obj.setGender((Boolean) dataObj[2]);
             obj.setClassid((String) dataObj[3]);
+
             studentDAO.updateObject(obj);
         }
         if(SemesterDAO.class.equals(saveClass))
@@ -377,15 +386,123 @@ class editActionHanle
             SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
             SemestersessionEntity obj=semesterSessionDAO.getObject((String) dataObj[0]);
             obj.setIdsemester((String)dataObj[1]);
-            obj.setDatebegin((Date)dataObj[2]);
-            obj.setDateend((Date) dataObj[3]);
+            obj.setDatebegin(SemestersessionEntity.convertStringToDate((String)dataObj[2]));
+            obj.setDateend(SemestersessionEntity.convertStringToDate((String) dataObj[3]));
+
             semesterSessionDAO.updateObject(obj);
+        }
+        if(CourseOpenDAO.class.equals(saveClass))
+        {
+            CourseOpenDAO courseOpenDAO=new CourseOpenDAO();
+            String courseOpenID=(String)dataObj[0]+(String)dataObj[1] ;
+            System.out.println(courseOpenID);
+            CourseopenEntity obj=courseOpenDAO.getObject(courseOpenID);
+            obj.setCourseclass((String) dataObj[1]);
+            String shift=(String) dataObj[2];
+            obj.setBeginshift(CourseOpenDAO.getBegin(shift));
+            obj.setEndshift(CourseOpenDAO.getEnd(shift));
+            obj.setDiw(CourseOpenDAO.getDIW(shift));
+            obj.setSemsesid(AcademicUI.getCurrentSemester());
+            obj.setTeacher((String) dataObj[3]);
+            obj.setMaxtotal(Integer.valueOf((String) dataObj[4]));
+
+            courseOpenDAO.updateObject(obj);
+        }
+    }
+
+    public static void setCurrentSemester(Object[][]data,String currentSemester)
+    {
+        int len=data.length;
+        if(len<=0)
+            return;
+        int lenData=data[0].length;
+        for(int i=0;i<len;i++)
+        {
+            String id=(String) data[i][0];
+            if(id.compareTo(currentSemester)>=0)
+            {
+
+                Boolean state=(Boolean) data[i][lenData-1];
+                if(state==false)
+                {
+                    data[i][lenData-1]=true;
+                    SemesterDAO semesterDAO=new SemesterDAO();
+                    SemesterEntity semester=semesterDAO.getObject(id);
+                    semester.setIscurrentsemester(true);
+
+                    semesterDAO.updateObject(semester);
+                }
+            }
+            else
+            {
+                Boolean state=(Boolean) data[i][lenData-1];
+                if(state==true)
+                {
+                    data[i][lenData-1]=false;
+                    SemesterDAO semesterDAO=new SemesterDAO();
+                    SemesterEntity semester=semesterDAO.getObject(id);
+                    semester.setIscurrentsemester(false);
+
+                    semesterDAO.updateObject(semester);
+                }
+            }
         }
     }
 }
 
+class removeActionHanle
+{
+    public static void removeData(Object[]dataObj,Class saveclass)
+    {
+
+        if(CRMuserDAO.class.equals(saveclass))
+        {
+            CRMuserDAO crMuserDAO=new CRMuserDAO();
+            CrmuserEntity obj=crMuserDAO.getObject((String) dataObj[0]);
+            crMuserDAO.removeObject(obj);
+        }
+        if(CRMclassDAO.class.equals(saveclass))
+        {
+            CRMclassDAO crMclassDAO=new CRMclassDAO();
+            CrmclassEntity obj=crMclassDAO.getObject((String) dataObj[0]);
+            crMclassDAO.removeObject(obj);
+        }
+        if(SubjectDAO.class.equals(saveclass))
+        {
+            SubjectDAO subjectDAO=new SubjectDAO();
+            SubjectEntity obj=subjectDAO.getObject((String) dataObj[0]);
+            subjectDAO.removeObject(obj);
+        }
+        if(StudentDAO.class.equals(saveclass))
+        {
+            StudentDAO studentDAO=new StudentDAO() ;
+            if(dataObj[0].getClass()==Integer.class)
+            {
+                dataObj[0]=String.valueOf(dataObj[0]);
+            }
+            StudentEntity obj=studentDAO.getObject((String) dataObj[0]);
+            studentDAO.removeObject(obj);
+        }
+        if(SemesterDAO.class.equals(saveclass))
+        {
+            SemesterDAO semesterDAO=new SemesterDAO();
+            SemesterEntity obj=semesterDAO.getObject((String) dataObj[0]);
+            semesterDAO.removeObject(obj);
+        }
+        if(SemesterSessionDAO.class.equals(saveclass))
+        {
+            SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
+            SemestersessionEntity obj=semesterSessionDAO.getObject((String) dataObj[0]);
+            semesterSessionDAO.removeObject(obj);
+        }
+    }
+
+
+}
+
 class handleData
 {
+
     public static Object[][] toArray(Vector<Vector>data)
     {
         int size=data.size();
@@ -430,6 +547,21 @@ class handleData
         }
         System.out.println(ret.size());
         return ret.toArray(new Object[0][]);
+    }
+
+    public static Object[][] getDataWithValue(Object[][]data,int Column,Object val)
+    {
+        System.out.println((String) val);
+        int len=data.length;
+        List<Object[]>retList=new ArrayList<>();
+        for(int i=0;i<len;i++)
+        {
+            String rowVal=(String) data[i][Column];
+            System.out.println(rowVal);
+            if(rowVal.compareTo((String) val)==0)
+                retList.add(data[i]);
+        }
+        return retList.toArray(new Object[0][]);
     }
 
     public static boolean isMissingData(Object[] dataObj)
@@ -480,13 +612,28 @@ class handleData
         return ret;
     }
 
-    public static Object[][] removeData(Object[][]data,int row)
+    public static Object[][] removeObject(Object[][]data, int index)
     {
         Object[][] ret;
-        java.util.List<Object[]> listData=Arrays.asList(data);
-        listData.remove(row);
+        java.util.List<Object[]> listData=new LinkedList<>(Arrays.asList(data));
+        listData.remove(index);
 
         ret=listData.toArray(new Object[0][]);
+        return ret;
+    }
+
+    public static int getIndexObject(Object[][]data,Object[]check)
+    {
+        int ret=-1;
+        for(int i=0;i<data.length;i++)
+        {
+            String checkData=(String) check[0];
+            String curData=(String) data[i][0];
+
+            if(checkData.compareTo(curData)==0)
+                return i;
+        }
+
         return ret;
     }
 

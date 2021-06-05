@@ -1,10 +1,7 @@
 package Main;
 
 import DAO.*;
-import POJO.CrmclassEntity;
-import POJO.CrmuserEntity;
-import POJO.SemestersessionEntity;
-import POJO.StudentEntity;
+import POJO.*;
 import UI.*;
 import java.util.List;
 
@@ -45,8 +42,21 @@ public class Main
 //        System.out.println(ret.length);
         AcademicUI acaui=new AcademicUI();
         acaui.setUpDisplay();
-
-//        System.out.println("ST19120721".indexOf("ST"));
+//        System.out.println("hello".compareTo(""));
+//        SubjectDAO subjectDAO=new SubjectDAO();
+//
+//
+//        Object[][] data=SubjectDAO.convertToObject(new SubjectDAO().getListObjects());
+//        for(int i=0;i< data.length;i++)
+//            System.out.println(data[i][1]);
+//        SubjectEntity subject=subjectDAO.getObject("CSC00083");
+//        subject.setSubjectname("why");
+//        subjectDAO.updateObject(subject);
+//
+//        data=SubjectDAO.convertToObject(new SubjectDAO().getListObjects());
+//        for(int i=0;i< data.length;i++)
+//            System.out.println(data[i][1]);
+        //        System.out.println("ST19120721".indexOf("ST"));
 //        SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
 //        SemestersessionEntity test=new SemestersessionEntity();
 //        test.setSemsesid("test");

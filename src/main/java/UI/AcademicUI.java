@@ -3,24 +3,22 @@ package UI;
 import javax.swing.*;
 import DAO.*;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.Vector;
 
 public class AcademicUI
 {
     private JFrame mainframe;
-    private static Object[][] courseTableData;
-    private static Object[][] userTableData;
+     private static Object[][] userTableData;
     private static Object[][] subjectTableData;
+    private static Object[][] courseTableData;
     private static Object[][] classTableData;
     private static Object[][] studentTableData;
+
+
     private static Object[][] semesterTableData;
     private static Object[][] semsesTableData;
 
@@ -39,7 +37,7 @@ public class AcademicUI
 
         userTableData=CRMuserDAO.convertToObject(crMuserDAO.getListObjects());
         classTableData=CRMclassDAO.convertToObject(crMclassDAO.getListObjects());
-        subjectTableData =SubjectDAO.convertToObject(subjectDAO.getListObjects());
+         subjectTableData=SubjectDAO.convertToObject(subjectDAO.getListObjects());
         courseTableData=CourseOpenDAO.convertToObject(courseOpenDAO.getListObjects());
         studentTableData=StudentDAO.convertToObject(studentDAO.getListObjects());
         semesterTableData=SemesterDAO.convertToObject(semesterDAO.getListObjects());
@@ -189,7 +187,7 @@ public class AcademicUI
             @Override
             public boolean isCellEditable(int row, int column) {
                 //all cells false
-                return column==userTableData[0].length-1;
+                return false;
             }
         } ;
 
@@ -215,10 +213,13 @@ public class AcademicUI
         searchCombo.setBounds(130,50,100,30);
         JTextField searchTextField=new JTextField();
         searchTextField.setBounds(230,50,350,30);
+        JButton refreshButton=new JButton("Refresh");
+        refreshButton.setBounds(650,50,100,30);
 
         topPanel.add(searchLabel);
         topPanel.add(searchCombo);
         topPanel.add(searchTextField);
+        topPanel.add(refreshButton);
 
 
         //set up bottom panel
@@ -247,18 +248,26 @@ public class AcademicUI
                 int selected=accountTable.getSelectedRow();
                 while (selected>=0)
                 {
+
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION)
                     {
-                        df.removeRow(selected);
-                        accountTable.setModel(df);
+
+                        Object[][]displayData=handleData.toArray(df.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,CRMuserDAO.class);
+                        userTableData =handleData.removeObject(userTableData,handleData.getIndexObject(userTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+                        df.setDataVector(displayData,headerTable);
+                        accountTable.setModel(df);
 
                     }
                     else if(choose==JOptionPane.NO_OPTION)
                     {
                         break;
                     }
+
                     selected=accountTable.getSelectedRow();
                 }
 
@@ -288,6 +297,19 @@ public class AcademicUI
                 addActionHandle.setUpAdd(headerTable,dataSample,"Account");
             }
         });
+        refreshButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                //update base data base
+                userTableData=CRMuserDAO.convertToObject(new CRMuserDAO().getListObjects());
+                String cur=searchTextField.getText();
+                int selected=searchCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(userTableData,selected,cur);
+                df.setDataVector(displayData,headerTable);
+                accountTable.setModel(df);
+            }
+        });
 
         //set up jtext
         searchTextField.addKeyListener(new KeyAdapter() {
@@ -296,7 +318,7 @@ public class AcademicUI
                 super.keyReleased(e);
                 String cur=searchTextField.getText();
                 int selected=searchCombo.getSelectedIndex();
-                Object[][] dataDisplay= handleData.filterData(userTableData,selected,cur);
+                Object[][] dataDisplay= handleData.filterData(classTableData,selected,cur);
                 df.setDataVector(dataDisplay,headerTable);
                 accountTable.setModel(df);
                 mainframe.setVisible(true);
@@ -349,11 +371,13 @@ public class AcademicUI
         searchCombo.setBounds(130,50,100,30);
         JTextField searchTextField=new JTextField();
         searchTextField.setBounds(230,50,350,30);
+        JButton refreshButton=new JButton("Refresh");
+        refreshButton.setBounds(650,50,100,30);
 
         topPanel.add(searchLabel);
         topPanel.add(searchCombo);
         topPanel.add(searchTextField);
-
+        topPanel.add(refreshButton);
 
         //set up bottom panel
         JPanel emptyPanel2=new JPanel();
@@ -385,10 +409,16 @@ public class AcademicUI
                 {
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        subjectTable.setModel(df);
+                        Object[][]displayData=handleData.toArray(df.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,SubjectDAO.class);
 
+                        subjectTableData =handleData.removeObject(subjectTableData,handleData.getIndexObject(subjectTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+
+                        df.setDataVector(displayData,headerTable);
+                        subjectTable.setModel(df);
                     }
                     else if(choose==JOptionPane.NO_OPTION)
                     {
@@ -406,10 +436,24 @@ public class AcademicUI
                 int selected=subjectTable.getSelectedRow();
                 if(selected>=0)
                 {
-                    Object[] rowData=subjectTableData[selected];
+                    Object[] rowData= subjectTableData[selected];
                     String[]header={"SubjectID","Name","Credit","Faculty"};
+                    System.out.println("Before edit");
                     editActionHanle.setUpEdit(header,rowData,"Subject");
+                    System.out.println("After edit");
+
                 }
+                String cur=searchTextField.getText();
+
+                //update table
+
+
+                int columnselected=searchCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(subjectTableData,columnselected,cur);
+
+
+                df.setDataVector(displayData,headerTable);
+                subjectTable.setModel(df);
                 mainframe.setVisible(true);
             }
         });
@@ -419,9 +463,30 @@ public class AcademicUI
                 super.mouseClicked(e);
                 Object[] dataSample={"String","String",Integer.valueOf(1),"String"};
                 addActionHandle.setUpAdd(headerTable,dataSample,"Subject");
+                String cur=searchTextField.getText();
+                subjectTableData=SubjectDAO.convertToObject(new SubjectDAO().getListObjects());
+                int columnselected=searchCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(subjectTableData,columnselected,cur);
+
+                df.setDataVector(displayData,headerTable);
+                subjectTable.setModel(df);
+                mainframe.setVisible(true);
             }
         });
 
+        refreshButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                //update base data base
+                subjectTableData=SubjectDAO.convertToObject(new SubjectDAO().getListObjects());
+                String cur=searchTextField.getText();
+                int selected=searchCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(subjectTableData,selected,cur);
+                df.setDataVector(displayData,headerTable);
+                subjectTable.setModel(df);
+            }
+        });
         //set up jtext
         searchTextField.addKeyListener(new KeyAdapter() {
             @Override
@@ -435,6 +500,8 @@ public class AcademicUI
                 mainframe.setVisible(true);
             }
         });
+
+
 
         //add to current
         currentPanel.add(topPanel,BorderLayout.NORTH);
@@ -514,11 +581,13 @@ public class AcademicUI
         searchClassCombo.setBackground(Color.WHITE);
         JTextField searchClassTextField=new JTextField();
         searchClassTextField.setBounds(210,10,350,30);
-
+        JButton refreshClassButton=new JButton("Refresh");
+        refreshClassButton.setBounds(680,10,100,30);
 
         funcClassPanel.add(searchClassLabel);
         funcClassPanel.add(searchClassCombo);
         funcClassPanel.add(searchClassTextField);
+        funcClassPanel.add(refreshClassButton);
 
         JPanel editClassPanel=new JPanel();
         editClassPanel.setPreferredSize(new Dimension(100,classPanel.getHeight()));
@@ -544,10 +613,12 @@ public class AcademicUI
         studentPanel.setMaximumSize(new Dimension(currentPanel.getWidth(),250));
         studentPanel.setLayout(new BorderLayout());
 
+
         JPanel funcStudentPanel=new JPanel();
         funcStudentPanel.setPreferredSize(new Dimension(currentPanel.getWidth()-100,50));
         funcStudentPanel.setMaximumSize(new Dimension(currentPanel.getWidth()-100,50));
         funcStudentPanel.setLayout(null);
+
 
         JLabel searchStudentLabel=new JLabel("Search: ");
         searchStudentLabel.setBounds(10,10,100,30);
@@ -557,13 +628,15 @@ public class AcademicUI
         JTextField searchStudentTextField=new JTextField();
         searchStudentTextField.setBounds(210,10,350,30);
         JComboBox classChooseCombo=new JComboBox(handleData.getDataColumn(classTableData,0));
-        classChooseCombo.setBounds(580,10,100,30);
-
+        classChooseCombo.setBounds(580,10,80,30);
+        JButton refreshStudentButton=new JButton("Refresh");
+        refreshStudentButton.setBounds(680,10,100,30);
 
         funcStudentPanel.add(searchStudentLabel);
         funcStudentPanel.add(searchStudentCombo);
         funcStudentPanel.add(searchStudentTextField);
         funcStudentPanel.add(classChooseCombo);
+        funcStudentPanel.add(refreshStudentButton);
 
         JPanel editStudentPanel=new JPanel();
         editStudentPanel.setPreferredSize(new Dimension(100,classPanel.getHeight()));
@@ -621,9 +694,15 @@ public class AcademicUI
                 {
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        classTable.setModel(df);
+                        Object[][]displayData=handleData.toArray(df.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,CRMclassDAO.class);
+
+                        classTableData =handleData.removeObject(classTableData,handleData.getIndexObject(classTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+                        df.setDataVector(displayData,headerTable);
+                        classTable.setModel(df);
 
                     }
                     else if(choose==JOptionPane.NO_OPTION)
@@ -644,10 +723,15 @@ public class AcademicUI
                 {
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        studenTable.setModel(df);
+                        Object[][]displayData=handleData.toArray(df2.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,StudentDAO.class);
 
+                        studentTableData =handleData.removeObject(studentTableData,handleData.getIndexObject(studentTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+                        df2.setDataVector(displayData,headerTable);
+                        studenTable.setModel(df);
                     }
                     else if(choose==JOptionPane.NO_OPTION)
                     {
@@ -692,6 +776,32 @@ public class AcademicUI
             }
         });
 
+        refreshClassButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                //update base data base
+                classTableData=CRMclassDAO.convertToObject(new CRMclassDAO().getListObjects());
+                String cur=searchClassTextField.getText();
+                int selected=searchClassCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(classTableData,selected,cur);
+                df.setDataVector(displayData,headerTable);
+                classTable.setModel(df);
+            }
+        });
+        refreshStudentButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                studentTableData=StudentDAO.convertToObject(new StudentDAO().getListObjects());
+                String cur=searchStudentTextField.getText();
+                int selected=searchStudentCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(studentTableData,selected,cur);
+                df2.setDataVector(displayData,headerTable2);
+                studenTable.setModel(df2);
+            }
+        });
+
         //set up text field
         searchClassTextField.addKeyListener(new KeyAdapter() {
             @Override
@@ -720,6 +830,18 @@ public class AcademicUI
             }
         });
 
+        classChooseCombo.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+
+                Object[][] currentData=handleData.filterData(studentTableData,searchStudentCombo.getSelectedIndex(),searchStudentTextField.getText());
+                Object[][] displayData=handleData.getDataWithValue(currentData,3,classChooseCombo.getSelectedItem());
+                System.out.println(displayData.length);
+                df2.setDataVector(displayData,headerTable2);
+                studenTable.setModel(df2);
+                mainframe.setVisible(true);
+            }
+        });
 
         //add to current
         currentPanel.setLayout(new BorderLayout());
@@ -768,10 +890,13 @@ public class AcademicUI
         searchCombo.setBounds(130,50,100,30);
         JTextField searchTextField=new JTextField();
         searchTextField.setBounds(230,50,350,30);
+        JButton refreshButton=new JButton("Refresh");
+        refreshButton.setBounds(650,50,100,30);
 
         topPanel.add(searchLabel);
         topPanel.add(searchCombo);
         topPanel.add(searchTextField);
+        topPanel.add(refreshButton);
 
         //set up bottom panel
         JPanel emptyPanel2=new JPanel();
@@ -802,10 +927,15 @@ public class AcademicUI
                 {
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        courseTable.setModel(df);
+                        Object[][]displayData=handleData.toArray(df.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,CourseOpenDAO.class);
 
+                        courseTableData=handleData.removeObject(courseTableData,handleData.getIndexObject(courseTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+                        df.setDataVector(displayData,headerTable);
+                       courseTable.setModel(df);
                     }
                     else if(choose==JOptionPane.NO_OPTION)
                     {
@@ -840,6 +970,21 @@ public class AcademicUI
                 Object[] dataSample={"String","String",Integer.valueOf(1),Integer.valueOf(1),
                         Integer.valueOf(1),"String",Integer.valueOf(1)};
                 addActionHandle.setUpAdd(header,dataSample,"CourseOpen");
+            }
+        });
+
+        refreshButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                //update base data base
+               courseTableData=CourseOpenDAO.convertToObject(new CourseOpenDAO().getListObjects());
+
+                String cur=searchTextField.getText();
+                int selected=searchCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(courseTableData,selected,cur);
+                df.setDataVector(displayData,headerTable);
+                courseTable.setModel(df);
             }
         });
 
@@ -935,10 +1080,13 @@ public class AcademicUI
         searchSemesterCombo.setBackground(Color.WHITE);
         JTextField searchSemesterTextField=new JTextField();
         searchSemesterTextField.setBounds(210,10,350,30);
+        JButton refreshSemesterButton=new JButton("Refresh");
+        refreshSemesterButton.setBounds(680,10,100,30);
 
         funcSemesterPanel.add(searchSemesterLabel);
         funcSemesterPanel.add(searchSemesterCombo);
         funcSemesterPanel.add(searchSemesterTextField);
+        funcSemesterPanel.add(refreshSemesterButton);
 
         JPanel editSemesterPanel=new JPanel();
         editSemesterPanel.setPreferredSize(new Dimension(100,semesterPanel.getHeight()));
@@ -955,15 +1103,26 @@ public class AcademicUI
 
         JPanel bottomSemesterPanel=new JPanel();
         bottomSemesterPanel.setPreferredSize(new Dimension(semesterPanel.getWidth()-100,80));
+        bottomSemesterPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         bottomSemesterPanel.setLayout(null);
 
         JLabel setSemesterLabel=new JLabel("Set current semester:");
         setSemesterLabel.setBounds(10,10,200,50);
         String[] idData={"Test1","Test2"};
-        JComboBox semesterIDCombo=new JComboBox(idData);
-        semesterIDCombo.setBounds(210,10,100,50);
+        JComboBox semesterIDCombo=new JComboBox(handleData.getDataColumn(semesterTableData,0));
+        semesterIDCombo.setBounds(210,20,100,30);
         JButton setButton=new JButton("Set");
-        setButton.setBounds(310,10,100,50);
+        setButton.setBounds(310,20,100,30);
+
+        setButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                String current=(String)semesterIDCombo.getSelectedItem();
+                editActionHanle.setCurrentSemester(semesterTableData,current);
+                JOptionPane.showMessageDialog(null,"The current semsemter: "+current);
+            }
+        });
 
         bottomSemesterPanel.add(setSemesterLabel);
         bottomSemesterPanel.add(semesterIDCombo);
@@ -993,10 +1152,13 @@ public class AcademicUI
         searchSemesCombo.setBackground(Color.WHITE);
         JTextField searchSemsesTextField=new JTextField();
         searchSemsesTextField.setBounds(210,10,350,30);
+        JButton refreshSemsesButton=new JButton("Refresh");
+        refreshSemsesButton.setBounds(680,10,100,30);
 
         funcSemsesPanel.add(searchSemsesLabel);
         funcSemsesPanel.add(searchSemesCombo);
         funcSemsesPanel.add(searchSemsesTextField);
+        funcSemsesPanel.add(refreshSemsesButton);
 
         JPanel editSemsesPanel=new JPanel();
         editSemsesPanel.setPreferredSize(new Dimension(100,semesterPanel.getHeight()));
@@ -1058,10 +1220,15 @@ public class AcademicUI
                 {
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        semesterTable.setModel(df);
+                        Object[][]displayData=handleData.toArray(df.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,SemesterDAO.class);
 
+                        semesterTableData=handleData.removeObject(semesterTableData,handleData.getIndexObject(semesterTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+                        df.setDataVector(displayData,headerTable);
+                        semesterTable.setModel(df);
                     }
                     else if(choose==JOptionPane.NO_OPTION)
                     {
@@ -1082,10 +1249,15 @@ public class AcademicUI
                 {
                     int choose=JOptionPane.showConfirmDialog(null,"Do you want to delete selected row","Delete row",JOptionPane.YES_NO_OPTION);
                     if(choose==JOptionPane.YES_OPTION) {
-                        df.removeRow(selected);
-                        semsesTable.setModel(df);
+                        Object[][]displayData=handleData.toArray(df2.getDataVector());
                         //TODO: delete in database
+                        Object[]rowData=displayData[selected];
+                        removeActionHanle.removeData(rowData,SemesterSessionDAO.class);
 
+                        semsesTableData=handleData.removeObject(semsesTableData,handleData.getIndexObject(semsesTableData,rowData));
+                        displayData=handleData.removeObject(displayData,selected);
+                        df2.setDataVector(displayData,headerTable);
+                        semsesTable.setModel(df2);
                     }
                     else if(choose==JOptionPane.NO_OPTION)
                     {
@@ -1126,8 +1298,35 @@ public class AcademicUI
             }
         });
 
-        //set up textfield
+        refreshSemesterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                //update base data base
+                semesterTableData=SemesterDAO.convertToObject(new SemesterDAO().getListObjects());
+                String cur=searchSemesterTextField.getText();
+                int selected=searchSemesterCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(semesterTableData,selected,cur);
+                df.setDataVector(displayData,headerTable);
+                semesterTable.setModel(df);
+            }
+        });
 
+        refreshSemesterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                //update base data base
+                semsesTableData=SemesterSessionDAO.convertToObject(new SemesterSessionDAO().getListObjects());
+                String cur=searchSemsesTextField.getText();
+                int selected=searchSemesCombo.getSelectedIndex();
+                Object[][]displayData=handleData.filterData(semsesTableData,selected,cur);
+                df2.setDataVector(displayData,headerTable2);
+                semsesTable.setModel(df2);
+            }
+        });
+
+        //set up textfield
         searchSemesterTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -1163,112 +1362,6 @@ public class AcademicUI
 
     }
 
-    public void setUpEdit(String[]labelData,Object[]data,String CMD)
-    {
-        System.out.println("Setting up edit");
-        JFrame editFrame=new JFrame("Edit "+CMD);
-        editFrame.setDefaultLookAndFeelDecorated(true);
-        editFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        editFrame.setSize(new Dimension(400,200));
-        editFrame.setPreferredSize(new Dimension(400,200));
-
-
-        int len=data.length;
-
-        JPanel editPanel=new JPanel();
-        editPanel.setPreferredSize(new Dimension(300,200));
-        editPanel.setLayout(new GridLayout(2,len));
-        for(int i=0;i<len;i++)
-        {
-            JLabel curLabel=new JLabel(labelData[i]);
-            curLabel.setHorizontalAlignment(JLabel.CENTER);
-            editPanel.add(curLabel);
-        }
-        for(int i=0;i<len;i++)
-        {
-            JTextField curTextField=new JTextField();
-            curTextField.setText((String) data[i]);
-            editPanel.add(curTextField);
-        }
-
-        JPanel confirmPanel=new JPanel();
-        confirmPanel.setPreferredSize(new Dimension(100,editFrame.getHeight()));
-        confirmPanel.setMaximumSize(new Dimension(100,editFrame.getHeight()));
-        JButton confirmButton=new JButton("Confirm");
-        confirmPanel.add(confirmButton,BorderLayout.CENTER);
-
-        editFrame.add(editPanel,BorderLayout.CENTER);
-        editFrame.add(confirmPanel,BorderLayout.EAST);
-
-        //set up button
-        confirmButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                //TODO: do sth with database
-            }
-        });
-
-        editFrame.setVisible(true);
-    }
-
-    private void setUpAdd(String[]labelData,Object[]data,String CMD)
-    {
-        System.out.println("Setting up add"+CMD);
-        JFrame addFrame=new JFrame("Add "+CMD);
-        addFrame.setDefaultLookAndFeelDecorated(true);
-        addFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        addFrame.setSize(new Dimension(400,200));
-        addFrame.setPreferredSize(new Dimension(400,200));
-
-
-        int len=data.length;
-
-        JPanel addPanel=new JPanel();
-        addPanel.setPreferredSize(new Dimension(300,200));
-        addPanel.setLayout(new GridLayout(2,len));
-        for(int i=0;i<len;i++)
-        {
-            JLabel curLabel=new JLabel(labelData[i]);
-            curLabel.setHorizontalAlignment(JLabel.CENTER);
-            addPanel.add(curLabel);
-        }
-        for(int i=0;i<len;i++)
-        {
-
-
-            if(data[i].getClass()==Boolean.class)
-            {
-                JCheckBox checkBox=new JCheckBox();
-                checkBox.setSelected((Boolean) data[i]);
-                addPanel.add(checkBox);
-            }
-            else {
-                JTextField curTextField = new JTextField();
-                curTextField.setText((String) data[i]);
-                addPanel.add(curTextField);
-            }
-        }
-
-        JPanel confirmPanel=new JPanel();
-        confirmPanel.setPreferredSize(new Dimension(100,addFrame.getHeight()));
-        confirmPanel.setMaximumSize(new Dimension(100,addFrame.getHeight()));
-        JButton confirmButton=new JButton("Confirm");
-        confirmPanel.add(confirmButton,BorderLayout.CENTER);
-
-        addFrame.add(addPanel,BorderLayout.CENTER);
-        addFrame.add(confirmPanel,BorderLayout.EAST);
-
-        //set up button
-        confirmButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                //TODO: do sth with database
-            }
-        });
-        addFrame.setVisible(true);
-    }
 
     public static String getCurrentSemester()
     {

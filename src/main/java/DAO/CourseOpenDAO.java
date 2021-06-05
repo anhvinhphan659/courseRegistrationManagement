@@ -55,6 +55,18 @@ public class CourseOpenDAO
         }
     }
 
+    public void updateObject(CourseopenEntity course)
+    {
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
+
+        session.update(course);
+        tx.commit();
+    }
+
     public void removeObject(CourseopenEntity courseopen)
     {
         if(courseopen!=null) {
@@ -112,5 +124,30 @@ public class CourseOpenDAO
 
         }
         return null;
+    }
+
+    public static Integer getDIW(String shift)
+    {
+        String[]data=shift.split(" ");
+        return Integer.valueOf(data[1]);
+    }
+
+    public static Integer getBegin(String shift)
+    {
+        String[]data=shift.split(" ");
+        String[] shift_data=data[0].split("-");
+        String begin=shift=shift_data[0];
+        begin=begin.strip();
+        System.out.println(Integer.valueOf(String.valueOf(begin.charAt(1))));
+        return Integer.valueOf(String.valueOf(begin.charAt(1)));
+    }
+    public static Integer getEnd(String shift)
+    {
+        String[]data=shift.split(" ");
+        String[] shift_data=data[0].split("-");
+        String end=shift_data[1];
+        end=end.strip();
+        System.out.println(Integer.valueOf(String.valueOf(end.charAt(0))));
+        return Integer.valueOf(String.valueOf(end.charAt(0)));
     }
 }
