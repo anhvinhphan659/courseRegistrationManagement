@@ -500,94 +500,85 @@ class removeActionHanle
 
 }
 
-class handleData
-{
+class handleData {
 
-    public static Object[][] toArray(Vector<Vector>data)
-    {
-        int size=data.size();
-        Object[][]ret =new Object[size][];
-        for(int i=0;i<size;i++)
-        {
-            ret[i]=data.get(i).toArray();
+    public static Object[][] toArray(Vector<Vector> data) {
+        int size = data.size();
+        Object[][] ret = new Object[size][];
+        for (int i = 0; i < size; i++) {
+            ret[i] = data.get(i).toArray();
         }
 
         return ret;
     }
-    public static Object[] getDataColumn(Object[][]data,int column)
-    {
-        List<Object>ret=new ArrayList<>();
-        int len= data.length;;
-        for(int i=0;i<len;i++)
+
+    public static Object[] getDataColumn(Object[][] data, int column) {
+        List<Object> ret = new ArrayList<>();
+        int len = data.length;
+        ;
+        for (int i = 0; i < len; i++)
             ret.add(data[i][column]);
         return ret.toArray();
     }
-    public static Object[][] filterData(Object[][]origindata, int column, String cur)
-    {
-        List<Object[]>ret=new ArrayList<>();
-        List<Object[]>data=Arrays.asList(origindata);
+
+    public static Object[][] filterData(Object[][] origindata, int column, String cur) {
+        List<Object[]> ret = new ArrayList<>();
+        List<Object[]> data = Arrays.asList(origindata);
         System.out.println(column);
         System.out.println(data.size());
-        for(int i=0;i<data.size();i++)
-        {
+        for (int i = 0; i < data.size(); i++) {
             String text;
-            if(data.get(i)[column]==null)
-                text="";
-            else if(data.get(i)[column].getClass()== Date.class)
-                text=new SimpleDateFormat("yyyy/MM/dd").format((Date)data.get(i)[column]);
-            else if(data.get(i)[column].getClass()==Integer.class)
-                text=((Integer)data.get(i)[column]).toString();
-            else if(data.get(i)[column].getClass()==Boolean.class)
-                text=((Boolean)data.get(i)[column]).toString();
+            if (data.get(i)[column] == null)
+                text = "";
+            else if (data.get(i)[column].getClass() == Date.class)
+                text = new SimpleDateFormat("yyyy/MM/dd").format((Date) data.get(i)[column]);
+            else if (data.get(i)[column].getClass() == Integer.class)
+                text = ((Integer) data.get(i)[column]).toString();
+            else if (data.get(i)[column].getClass() == Boolean.class)
+                text = ((Boolean) data.get(i)[column]).toString();
             else
-                text=(String) data.get(i)[column];
+                text = (String) data.get(i)[column];
 
-            if(text.indexOf(cur)>=0)
+            if (text.indexOf(cur) >= 0)
                 ret.add(origindata[i]);
         }
         System.out.println(ret.size());
         return ret.toArray(new Object[0][]);
     }
 
-    public static Object[][] getDataWithValue(Object[][]data,int Column,Object val)
-    {
+    public static Object[][] getDataWithValue(Object[][] data, int Column, Object val) {
         System.out.println((String) val);
-        int len=data.length;
-        List<Object[]>retList=new ArrayList<>();
-        for(int i=0;i<len;i++)
-        {
-            String rowVal=(String) data[i][Column];
+        int len = data.length;
+        List<Object[]> retList = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            String rowVal = (String) data[i][Column];
             System.out.println(rowVal);
-            if(rowVal.compareTo((String) val)==0)
+            if (rowVal.compareTo((String) val) == 0)
                 retList.add(data[i]);
         }
         return retList.toArray(new Object[0][]);
     }
 
-    public static boolean isMissingData(Object[] dataObj)
-    {
-        int len= dataObj.length;
-        for(int i=0;i<len;i++)
-        {
-            if(dataObj[i].getClass()==String.class)
-            {
-                String temp=(String) dataObj[i];
-                if(temp.isEmpty()==true)
+    public static boolean isMissingData(Object[] dataObj) {
+        int len = dataObj.length;
+        for (int i = 0; i < len; i++) {
+            if (dataObj[i].getClass() == String.class) {
+                String temp = (String) dataObj[i];
+                if (temp.isEmpty() == true)
                     return true;
             }
         }
         return false;
     }
-    public  static Object[] getDataComponent(List<Component>dataCompo)
-    {
-        List<Object> retList=new ArrayList<>();
-        for(int i=0;i<dataCompo.size();i++)
-        {
-            Component dat=dataCompo.get(i);
-            if(dat.getClass()==JCheckBox.class)
+
+    public static Object[] getDataComponent(List<Component> dataCompo) {
+        List<Object> retList = new ArrayList<>();
+        for (int i = 0; i < dataCompo.size(); i++) {
+            Component dat = dataCompo.get(i);
+            if (dat.getClass() == JCheckBox.class)
                 retList.add(((JCheckBox) dat).isSelected());
             else {
-                JTextField temp=(JTextField)dat;
+                JTextField temp = (JTextField) dat;
                 retList.add(temp.getText());
             }
 
@@ -597,55 +588,91 @@ class handleData
     }
 
 
-    public static Object[][] getDatawithState(Object[][]data,int boolColumn,Boolean val)
-    {
+    public static Object[][] getDatawithState(Object[][] data, int boolColumn, Boolean val) {
         Object[][] ret;
-        java.util.List<Object[]> listData= Arrays.asList(data);
-        java.util.List<Object[]> listRet=new ArrayList<>();
-        for(int i=0;i<listData.size();i++)
-        {
-            if(listData.get(i)[boolColumn]==val)
+        java.util.List<Object[]> listData = Arrays.asList(data);
+        java.util.List<Object[]> listRet = new ArrayList<>();
+        for (int i = 0; i < listData.size(); i++) {
+            System.out.println(listData.get(i)[boolColumn]);
+            if (((Boolean) listData.get(i)[boolColumn]) == val)
                 listRet.add(listData.get(i));
         }
 
-        ret=listRet.toArray(new Object[0][]);
+        ret = listRet.toArray(new Object[0][]);
         return ret;
     }
 
-    public static Object[][] removeObject(Object[][]data, int index)
-    {
+    public static Object[][] removeObject(Object[][] data, int index) {
         Object[][] ret;
-        java.util.List<Object[]> listData=new LinkedList<>(Arrays.asList(data));
+        java.util.List<Object[]> listData = new LinkedList<>(Arrays.asList(data));
         listData.remove(index);
 
-        ret=listData.toArray(new Object[0][]);
+        ret = listData.toArray(new Object[0][]);
         return ret;
     }
 
-    public static int getIndexObject(Object[][]data,Object[]check)
-    {
-        int ret=-1;
-        for(int i=0;i<data.length;i++)
-        {
-            String checkData=(String) check[0];
-            String curData=(String) data[i][0];
+    public static int getIndexObject(Object[][] data, Object[] check) {
+        int ret = -1;
+        for (int i = 0; i < data.length; i++) {
+            String checkData = (String) check[0];
+            String curData = (String) data[i][0];
 
-            if(checkData.compareTo(curData)==0)
+            if (checkData.compareTo(curData) == 0)
                 return i;
         }
 
         return ret;
     }
 
-    public static Object[][] addData(Object[][]data,Object[]newData)
-    {
-        Object[][] ret;
-        java.util.List<Object[]> listData=Arrays.asList(data);
-        listData.add(newData);
+    public static Object[][] joinColumn(Object[][] originData, Class className) {
+        int rowLen = originData.length;
+        int colLen = originData[0].length;
 
-        ret=listData.toArray(new Object[0][]);
+        Object[][] ret = new Object[rowLen][colLen + 1];
+        //copy data
+        for (int i = 0; i < rowLen; i++) {
+            for (int j = 0; j < colLen; j++) {
+
+
+                ret[i][j] = originData[i][j];
+
+            }
+            if (Boolean.class.equals(className))
+                ret[i][colLen] = Boolean.valueOf(false);
+            if (Integer.class.equals(className))
+                ret[i][colLen] = Integer.valueOf(0);
+
+        }
         return ret;
     }
+
+    public static Object[][] removeColumn(Object[][]originData,int column)
+    {
+        int rowLen = originData.length;
+        int colLen = originData[0].length;
+        Object[][] ret = new Object[rowLen][colLen -1];
+        if(column<colLen)
+        {
+
+            for(int i=0;i<rowLen;i++)
+            {
+
+                int index=0;
+                for(int j=0;j<colLen;j++)
+                {
+                    if(column==j)
+                        continue;
+                    ret[i][index++]=originData[i][j];
+                }
+            }
+            return ret;
+
+        }
+        return ret;
+    }
+
+
+
 
     public static Object[] getDistinct(Object[] data)
     {

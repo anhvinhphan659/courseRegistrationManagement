@@ -105,4 +105,18 @@ public class SemesterDAO
         }
         return null;
     }
+
+    public String getCurrentIDSemester()
+    {
+        String hql="FROM SemesterEntity s where s.iscurrentsemester =true";
+
+        Query data=session.createQuery(hql);
+        List<SemesterEntity>ret=data.list();
+        if(ret!=null)
+        {
+            SemesterEntity obj= ret.get(0);
+            return obj.getIdsemester();
+        }
+        return "None";
+    }
 }

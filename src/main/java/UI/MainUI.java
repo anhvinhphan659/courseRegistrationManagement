@@ -125,6 +125,8 @@ public class MainUI
                             break;
                         case 1:
                             StudentUI studentUI=new StudentUI();
+                            studentUI.setAccount(acc);
+                            studentUI.setPass(pas);
                             mainframe.dispose();
 
 

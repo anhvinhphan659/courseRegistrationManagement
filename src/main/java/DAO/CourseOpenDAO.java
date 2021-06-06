@@ -117,7 +117,7 @@ public class CourseOpenDAO
                         "("+Integer.valueOf(temp.getBeginshift())
                         + "-" + Integer.valueOf(temp.getEndshift())
                         +") "+ Integer.valueOf(temp.getDiw()),
-                        temp.getTeacher(),temp.getMaxtotal()};
+                        temp.getTeacher(),temp.getMaxtotal(),temp.getSemsesid()};
                 ret.add(add);
             }
             return ret.toArray(new Object[0][]);
@@ -149,5 +149,13 @@ public class CourseOpenDAO
         end=end.strip();
         System.out.println(Integer.valueOf(String.valueOf(end.charAt(0))));
         return Integer.valueOf(String.valueOf(end.charAt(0)));
+    }
+
+    public static String getShift(CourseopenEntity course)
+    {
+        String begin=String.valueOf(course.getBeginshift());
+        String end=String.valueOf(course.getEndshift());
+        String diw=String.valueOf(course.getDiw());
+        return "("+begin+"-"+end+") "+diw;
     }
 }

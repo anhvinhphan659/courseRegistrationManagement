@@ -3,6 +3,9 @@ package Main;
 import DAO.*;
 import POJO.*;
 import UI.*;
+
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 
 public class Main
@@ -40,8 +43,8 @@ public class Main
 //        System.out.println(userdao.getListObject().size());
 //        Object[][]ret=CRMuserDAO.convertToObject(userdao.getListObject());
 //        System.out.println(ret.length);
-        AcademicUI acaui=new AcademicUI();
-        acaui.setUpDisplay();
+//        AcademicUI acaui=new AcademicUI();
+//        acaui.setUpDisplay();
 //        System.out.println("hello".compareTo(""));
 //        SubjectDAO subjectDAO=new SubjectDAO();
 //
@@ -62,8 +65,15 @@ public class Main
 //        test.setSemsesid("test");
 //        semesterSessionDAO.saveObject(test);
 //
-//        StudentUI studentUI=new StudentUI();
-//        studentUI.setUpDisplay();
+        StudentUI studentUI=new StudentUI("19120721","123456");
+        studentUI.setUpDisplay();
+
+
+        Object[][]test=studentUI.getAllRegistedCourse();
+        System.out.println(test.length);
+
+//        System.out.println(new Date(Calendar.getInstance().getTime().getTime()));
+//        System.out.println(new SemesterDAO().getCurrentIDSemester());
 //        CRMuserDAO crMuserDAO=new CRMuserDAO();
 //                       int res= crMuserDAO.checkAccount("sa","123456");
 //       System.out.println(res);
