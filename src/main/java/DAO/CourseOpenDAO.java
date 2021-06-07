@@ -20,11 +20,11 @@ public class CourseOpenDAO
     public CourseOpenDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        session=hb.getSessionfactory().openSession();
 
+            session=hb.getSessionfactory().openSession();
 
-            System.out.println("Initial Transaction at Intialize");
-            tx = session.beginTransaction();
+        System.out.println("Initial Transaction at Intialize");
+        tx = session.beginTransaction();
 
 
     }
@@ -32,11 +32,7 @@ public class CourseOpenDAO
     public CourseopenEntity getObject(String ID)
     {
         CourseopenEntity ret;
-        if(tx==null||tx.isActive()==false)
-        {
-            tx = session.beginTransaction();
-            System.out.println("Initial Transaction at save");
-        }
+
         ret=session.get(CourseopenEntity.class,ID);
         return ret;
     }
@@ -104,6 +100,20 @@ public class CourseOpenDAO
         System.out.println("Get list objects successfully from "+ret.getClass().toString());
         return ret;
     }
+
+    public List<CourseopenEntity> getListObjects(String semesterID)
+    {
+        String hql="FROM CourseopenEntity c where c.semsesid=:sem";
+
+
+        Query data= session.createQuery(hql);
+        data.setParameter("sem",semesterID);
+        List<CourseopenEntity> ret=data.list();
+        System.out.println("Get list objects successfully from "+ret.getClass().toString());
+        return ret;
+    }
+
+
 
     public static Object[][] convertToObject(List<CourseopenEntity>data)
     {

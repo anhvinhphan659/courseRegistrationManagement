@@ -65,12 +65,26 @@ public class Main
 //        test.setSemsesid("test");
 //        semesterSessionDAO.saveObject(test);
 //
-        StudentUI studentUI=new StudentUI("19120721","123456");
-        studentUI.setUpDisplay();
+//        StudentUI studentUI=new StudentUI("19120721","123456");
+//        studentUI.setUpDisplay();
+
+        MainUI mainUI=new MainUI();
+        mainUI.setUpMain();
+//        StudentUI studentUI=new StudentUI();
+//        System.out.println(studentUI.checkSemesterSession());
 
 
-        Object[][]test=studentUI.getAllRegistedCourse();
-        System.out.println(test.length);
+//        java.sql.Date date=new Date(1222333);
+//        date.setDate(6);
+//        date.setMonth(6);
+//        date.setYear(2021);
+//        Date today=new Date(Calendar.getInstance().getTime().getTime());
+//        int ret=date.compareTo(today);
+//        System.out.println(ret);
+//        ret=today.compareTo(date);
+//
+//        Object[][]test=studentUI.getAllRegistedCourse();
+//        System.out.println(test.length);
 
 //        System.out.println(new Date(Calendar.getInstance().getTime().getTime()));
 //        System.out.println(new SemesterDAO().getCurrentIDSemester());

@@ -17,11 +17,19 @@ public class CRMclassDAO
     public CRMclassDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        session=hb.getSessionfactory().openSession();
+        if(session==null)
+            session=hb.getSessionfactory().openSession();
+        else
+            session=hb.getSessionfactory().getCurrentSession();
 
 
-     System.out.println("Initial Transaction at Intialize");
-     tx = session.beginTransaction();
+
+        System.out.println("Initial Transaction at Intialize");
+        if(tx==null||tx.isActive()==false)
+        {
+            tx = session.beginTransaction();
+            System.out.println("Initial Transaction at save");
+        }
         System.out.println(session.toString());
         System.out.println(tx.toString());
 

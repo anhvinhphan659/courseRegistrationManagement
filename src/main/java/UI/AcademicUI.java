@@ -2,12 +2,14 @@ package UI;
 
 import javax.swing.*;
 import DAO.*;
+import POJO.StudentEntity;
 
 import java.awt.event.*;
 
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Arrays;
 
 public class AcademicUI
 {
@@ -17,7 +19,7 @@ public class AcademicUI
     private static Object[][] courseTableData;
     private static Object[][] classTableData;
     private static Object[][] studentTableData;
-
+    private static Object[][] orginCourseData;
 
     private static Object[][] semesterTableData;
     private static Object[][] semsesTableData;
@@ -38,10 +40,12 @@ public class AcademicUI
         userTableData=CRMuserDAO.convertToObject(crMuserDAO.getListObjects());
         classTableData=CRMclassDAO.convertToObject(crMclassDAO.getListObjects());
          subjectTableData=SubjectDAO.convertToObject(subjectDAO.getListObjects());
-        courseTableData=CourseOpenDAO.convertToObject(courseOpenDAO.getListObjects());
+         courseTableData=CourseOpenDAO.convertToObject(courseOpenDAO.getListObjects());
+         orginCourseData=courseTableData;
         studentTableData=StudentDAO.convertToObject(studentDAO.getListObjects());
         semesterTableData=SemesterDAO.convertToObject(semesterDAO.getListObjects());
         semsesTableData= SemesterSessionDAO.convertToObject(semesterSessionDAO.getListObjects());
+        courseTableData=handleData.getDataWithValue(courseTableData,5,getCurrentSemester());
     }
 
     public JFrame getMainframe()
@@ -627,7 +631,12 @@ public class AcademicUI
         searchStudentCombo.setBackground(Color.WHITE);
         JTextField searchStudentTextField=new JTextField();
         searchStudentTextField.setBounds(210,10,350,30);
-        JComboBox classChooseCombo=new JComboBox(handleData.getDataColumn(classTableData,0));
+        Object[] classDataCombo=handleData.getDataColumn(classTableData,0);
+        Arrays.sort(classDataCombo);
+        JComboBox classChooseCombo=new JComboBox(classDataCombo);
+        classChooseCombo.addItem("");
+        classChooseCombo.setSelectedItem("");
+
         classChooseCombo.setBounds(580,10,80,30);
         JButton refreshStudentButton=new JButton("Refresh");
         refreshStudentButton.setBounds(680,10,100,30);
@@ -646,10 +655,12 @@ public class AcademicUI
         JButton addStudentButton=new JButton("Add");
         JButton editStudentButton=new JButton("Edit");
         JButton removeStudentButton =new JButton("Remove");
+        JButton moreStudentButton=new JButton("More... ");
 
         editStudentPanel.add(addStudentButton);
         editStudentPanel.add(editStudentButton);
         editStudentPanel.add(removeStudentButton);
+        editStudentPanel.add(moreStudentButton);
 
         studentScroll.setPreferredSize(new Dimension(studentPanel.getWidth()-100,studentPanel.getHeight()-80));
         studentPanel.add(funcStudentPanel,BorderLayout.NORTH);
@@ -665,6 +676,17 @@ public class AcademicUI
         centerPanel.add(studentPanel,BorderLayout.CENTER);
 
         //set up button
+        moreStudentButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int selected=studenTable.getSelectedRow();
+                Object[][]displayData=handleData.toArray(df2.getDataVector());
+                Object[]rowData=displayData[selected];
+                setUpMoreDisplay(currentPanel,(String) rowData[0]);
+                mainframe.setVisible(true);
+            }
+        });
         addClassButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -682,6 +704,7 @@ public class AcademicUI
                 String[] header={"StudentID","Name","Gender","ClassID"};
                 Object[] sampleData={"String","String",false,"String"};
                 addActionHandle.setUpAdd(header,sampleData,"Student");
+
             }
         });
 
@@ -836,19 +859,21 @@ public class AcademicUI
 
                 Object[][] currentData=handleData.filterData(studentTableData,searchStudentCombo.getSelectedIndex(),searchStudentTextField.getText());
                 Object[][] displayData=handleData.getDataWithValue(currentData,3,classChooseCombo.getSelectedItem());
-                System.out.println(displayData.length);
+
                 df2.setDataVector(displayData,headerTable2);
                 studenTable.setModel(df2);
                 mainframe.setVisible(true);
             }
         });
 
+
+
         //add to current
         currentPanel.setLayout(new BorderLayout());
         currentPanel.add(emptyPanel,BorderLayout.NORTH);
         currentPanel.add(centerPanel,BorderLayout.CENTER);
         currentPanel.add(emptyPanel2,BorderLayout.SOUTH);
-
+        mainframe.setVisible(true);
     }
 
     public void setUpCourseDisplay(JPanel currentPanel)
@@ -1121,6 +1146,8 @@ public class AcademicUI
                 String current=(String)semesterIDCombo.getSelectedItem();
                 editActionHanle.setCurrentSemester(semesterTableData,current);
                 JOptionPane.showMessageDialog(null,"The current semsemter: "+current);
+                //update course display
+                courseTableData=handleData.getDataWithValue(orginCourseData,5,getCurrentSemester());
             }
         });
 
@@ -1362,6 +1389,112 @@ public class AcademicUI
 
     }
 
+    public void setUpMoreDisplay(JPanel currentPanel,String idStudent)
+    {
+        currentPanel.removeAll();
+        currentPanel.setLayout(new BorderLayout());
+
+        //set up data
+        Object[][]data=StudentUI.getAllRegistedCourse(idStudent);
+        StudentEntity student=new StudentDAO().getObject(idStudent);
+
+        //set up panel
+
+        JPanel topPanel=new JPanel();
+        topPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        topPanel.setLayout(null);
+        topPanel.setBackground(Color.ORANGE);
+        JPanel centerPanel=new JPanel();
+        centerPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),600));
+        centerPanel.setLayout(new BorderLayout());
+        JPanel bottomPanel=new JPanel();
+        bottomPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        bottomPanel.setBackground(Color.orange);
+
+        //set up top panel
+        JButton backToClassButton=new JButton("Back to Class");
+        backToClassButton.setBounds(20,20,200,30);
+
+        topPanel.add(backToClassButton);
+
+        //set up center panel
+        JPanel inforPanel=new JPanel();
+        inforPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),200));
+        inforPanel.setLayout(null);
+
+        JLabel inforLabel=new JLabel("Information: ");
+        JLabel idLabel=new JLabel("ID");
+        JLabel nameLabel=new JLabel("Name");
+        JLabel genderLabel=new JLabel("Gender");
+        JLabel classLabel=new JLabel("Class:");
+        JTextField idText=new JTextField();
+        JTextField nameText=new JTextField();
+        JTextField genderText=new JTextField();
+        JTextField classText=new JTextField();
+
+        idText.setText(student.getStudentid());
+        nameText.setText(student.getStudentname());
+        if(student.getGender()==true)
+            genderText.setText("Female");
+        else
+            genderText.setText("Male");
+        classText.setText(student.getClassid());
+
+        inforLabel.setBounds(10,10,100,30);
+        idLabel.setBounds(10,60,50,30);
+        idText.setBounds(60,60,100,30);
+        classLabel.setBounds(300,60,50,30);
+        classText.setBounds(350,60,50,30);
+        nameLabel.setBounds(10,110,50,30);
+        nameText.setBounds(60,110,200,30);
+        genderLabel.setBounds(300,110,50,30);
+        genderText.setBounds(350,110,50,30);
+
+        idText.setEnabled(false);
+        classText.setEnabled(false);
+        nameText.setEnabled(false);
+        genderText.setEnabled(false);
+
+        inforPanel.add(inforLabel);
+        inforPanel.add(idLabel);
+        inforPanel.add(idText);
+        inforPanel.add(classLabel);
+        inforPanel.add(classText);
+        inforPanel.add(nameLabel);
+        inforPanel.add(nameText);
+        inforPanel.add(genderLabel);
+        inforPanel.add(genderText);
+
+        JPanel courseRegistPanel=new JPanel();
+        courseRegistPanel.setPreferredSize(new Dimension(currentPanel.getWidth(), 400));
+        courseRegistPanel.setLayout(new BorderLayout());
+
+        String header[]={"SubjectID","Name","Course class","Credit","Shift","Teacher","Date registed"};
+        MyDefaultTableModel df=new MyDefaultTableModel(data,header);
+        JTable table=new JTable(df);
+        JScrollPane tableScroll=new JScrollPane(table);
+        courseRegistPanel.add(tableScroll);
+
+        inforPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED));
+        courseRegistPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED));
+
+        centerPanel.add(inforPanel,BorderLayout.NORTH);
+        centerPanel.add(courseRegistPanel,BorderLayout.CENTER);
+        //set up button
+        backToClassButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                setUpClassDisplay(currentPanel);
+            }
+        });
+
+        //add to current
+        currentPanel.add(topPanel,BorderLayout.NORTH);
+        currentPanel.add(centerPanel,BorderLayout.CENTER);
+        currentPanel.add(bottomPanel,BorderLayout.SOUTH);
+
+    }
 
     public static String getCurrentSemester()
     {

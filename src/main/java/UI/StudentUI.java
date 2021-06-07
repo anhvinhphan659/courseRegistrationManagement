@@ -2,12 +2,10 @@ package UI;
 
 import DAO.*;
 import POJO.*;
-import org.hibernate.event.service.spi.JpaBootstrapSensitive;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -19,6 +17,7 @@ import java.util.List;
 
 class MyDefaultTableModel extends DefaultTableModel {
     private Boolean[][] editable_cells; // 2d array to represent rows and columns
+
 
     MyDefaultTableModel(int rows, int cols) { // constructor
         super(rows, cols);
@@ -43,6 +42,8 @@ class MyDefaultTableModel extends DefaultTableModel {
     }
 
     public void setCellEditable(int row, int col, boolean value) {
+
+        if(editable_cells.length>0)
         this.editable_cells[row][col] = value; // set cell true/false
     }
 
@@ -80,19 +81,22 @@ public class StudentUI
     private JFrame mainframe;
     private Object[][] courseOpenTableData;
     private Object[][] courseRegistTableData;
+    private List<Object[]>courseRegistDataList;
     private Object[][] displayCourseOpenData;
     private Object[][] displayRegistOpenData;
+    private Boolean isSemesterSession;
     private static String account;
     private static String pass;
     private static java.sql.Date currentDate;
     private static StudentEntity user;
+    private static ImageIcon avatarImage;
     public StudentUI()
     {
         mainframe=new JFrame();
         mainframe.setTitle("Course Registration");
 
         courseOpenTableData= CourseOpenDAO.convertToObject(new CourseOpenDAO().getListObjects());
-        courseRegistTableData = CourseregistDAO.convertToObject(new CourseregistDAO().getListObject());
+        courseRegistTableData = CourseregistDAO.convertToObject(new CourseregistDAO().getListObject(account));
         currentDate=new Date(Calendar.getInstance().getTime().getTime());
 
     }
@@ -113,33 +117,49 @@ public class StudentUI
         String headerTable[]={"SubjectID","Subject name","Credit","Course class","Shift","Teacher","Total","Registred","Choose"};
 
         String idSemester=new SemesterDAO().getCurrentIDSemester();
+        System.out.println("current Init: "+idSemester);
         CourseOpenDAO courseOpenDAO=new CourseOpenDAO();
         SubjectDAO subjectDAO=new SubjectDAO();
         List<CourseopenEntity>courseOpenData=courseOpenDAO.getListObjects();
+
         List<Object[]>courseOpenListDisplay=new ArrayList<>();
+
         for(int i=0;i<courseOpenData.size();i++)
         {
+            System.out.println("current Init: "+courseOpenData.get(i).getSemsesid());
             if(courseOpenData.get(i).getSemsesid().compareTo(idSemester)==0)
             {
                 CourseopenEntity course=courseOpenData.get(i);
+                System.out.println("Init course"+course.getSubjectid());
                 SubjectEntity subject=subjectDAO.getObject(course.getSubjectid());
-                Object[] addData={
-                        subject.getSubjectid(),
-                        subject.getSubjectname(),
-                        subject.getCredit(),
-                        course.getCourseclass(),
-                        CourseOpenDAO.getShift(course),
-                        course.getTeacher(),
-                        course.getMaxtotal(),
-                        Integer.valueOf(0),
-                        false
-                };
-
-                courseOpenListDisplay.add(addData);
+                if(subject!=null) {
+                    Object[] addData = {
+                            subject.getSubjectid(),
+                            subject.getSubjectname(),
+                            subject.getCredit(),
+                            course.getCourseclass(),
+                            CourseOpenDAO.getShift(course),
+                            course.getTeacher(),
+                            course.getMaxtotal(),
+                            Integer.valueOf(0),
+                            false
+                    };
+                    System.out.println("get data"+course.getSubjectid());
+                    courseOpenListDisplay.add(addData);
+                }
             }
         }
         displayCourseOpenData=courseOpenListDisplay.toArray(new Object[0][]);
 
+        displayRegistOpenData=updateRegistred(displayCourseOpenData,acc);
+
+        for(int i=0;i<displayCourseOpenData.length;i++)
+            System.out.println(i+"-"+displayCourseOpenData[i][8]);
+
+        avatarImage=new ImageIcon( "image/avatar.png");
+        Image img=avatarImage.getImage().getScaledInstance(200,200,Image.SCALE_DEFAULT);
+        avatarImage.setImage(img);
+        isSemesterSession=checkSemesterSession();
 
 
     }
@@ -161,15 +181,6 @@ public class StudentUI
         this.pass = pass;
     }
 
-    public void setMainframe(JFrame anotherFrame)
-    {
-        mainframe=anotherFrame;
-    }
-
-    public JFrame getMainframe()
-    {
-        return mainframe;
-    }
 
     public void setUpDisplay()
     {
@@ -231,7 +242,10 @@ public class StudentUI
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                setUpCourseRegistDisplay(centerPanel);
+                if(isSemesterSession==true)
+                    setUpCourseRegistDisplay(centerPanel);
+                else
+                    setCloseRegisteCourseDisplay(centerPanel);
                 mainframe.setVisible(true);
             }
         });
@@ -274,7 +288,16 @@ public class StudentUI
         String headerTable[]={"SubjectID","Subject name","Credit","Course class","Shift","Teacher","Total","Registred","Choose"};
 
 
-        MyDefaultTableModel df=new MyDefaultTableModel(displayCourseOpenData,headerTable);
+        MyDefaultTableModel df=new MyDefaultTableModel(displayCourseOpenData,headerTable)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                if(column==8)
+                    if(((Integer)displayCourseOpenData[row][7]).compareTo((Integer) displayCourseOpenData[row][6])>0)
+                        return false;
+                return super.isCellEditable(row, column);
+            }
+        };
         df.setCellEditable(0,6,false);
         JTable courseOpenTable=new JTable(df) {
 
@@ -470,17 +493,19 @@ public class StudentUI
                             Object[] opencur = openData[j];
                             if ((String) cur[0] == (String) opencur[0]) {
                                 if ((String) cur[1] == (String) opencur[1]) {
-                                    df.setValueAt(false, j, 8);
+                                    displayCourseOpenData[j][8]=false;
+                                    df.setDataVector(displayCourseOpenData,headerTable);
                                     df.setCellEditable(j, 8, true);
                                 }
                             }
                         }
+                        //TODO: do sth with database
+                        String openID=(String)cur[0]+(String) cur[3];
+                        String IDregist=account+openID;
+                        CourseregistEntity obj=courseregistDAO.getObject(IDregist);
+                        courseregistDAO.removeObject(obj);
                     }
-                    //TODO: do sth with database
-                    String openID=(String)cur[0]+(String) cur[3];
-                    String IDregist=account+openID;
-                    CourseregistEntity obj=courseregistDAO.getObject(IDregist);
-                    courseregistDAO.removeObject(obj);
+
                 }
 
                 //update display for course result
@@ -543,6 +568,7 @@ public class StudentUI
         JTextField classTextField=new JTextField();
         JLabel genderLabel=new JLabel("Gender:");
         JTextField genderTextField=new JTextField();
+        JLabel iconLabel=new JLabel(avatarImage);
 
         //set up label and textfield
 
@@ -555,6 +581,7 @@ public class StudentUI
         classTextField.setBounds(150,170,350,30);
         genderLabel.setBounds(20,220,100,30);
         genderTextField.setBounds(150,220,350,30);
+        iconLabel.setBounds(550,70,200,200);
 
         studentIDTextField.setText(account);
         studentIDTextField.setEditable(false);
@@ -578,6 +605,9 @@ public class StudentUI
         informationPanel.add(classTextField);
         informationPanel.add(genderLabel);
         informationPanel.add(genderTextField);
+        informationPanel.add(iconLabel);
+
+        System.out.println(avatarImage);
 
 
 
@@ -671,7 +701,7 @@ public class StudentUI
 
         //set up data
         String headerTable[]={"SubjectID","Name","Course class","Credit","Shift","Teacher","Date registed"};
-        Object[][] courseRegistedData=getAllRegistedCourse();
+        Object[][] courseRegistedData=getAllRegistedCourse(account);
         MyDefaultTableModel df=new MyDefaultTableModel(courseRegistedData,headerTable);
         JTable courseRegistedTable=new JTable(df)
         {
@@ -708,6 +738,12 @@ public class StudentUI
         bottomPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
         bottomPanel.setBackground(Color.ORANGE);
 
+        //set up top panel
+        JLabel courseregistedLabel=new JLabel("Course registed: ");
+        courseregistedLabel.setBounds(10,50,200,30);
+
+        topPanel.add(courseregistedLabel);
+
         //set up center panel
         centerPanel.add(courseRegistedScroll);
 
@@ -716,6 +752,30 @@ public class StudentUI
         currentPanel.add(topPanel,BorderLayout.NORTH);
         currentPanel.add(centerPanel,BorderLayout.CENTER);
         currentPanel.add(bottomPanel,BorderLayout.SOUTH);
+    }
+    public void setCloseRegisteCourseDisplay(JPanel currentPanel)
+    {
+        currentPanel.removeAll();
+        currentPanel.setLayout(new BorderLayout());
+
+        //set up panel
+        JPanel centerPanel=new JPanel();
+        JPanel bottomPanel=new JPanel();
+
+
+        bottomPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),100));
+        bottomPanel.setBackground(Color.orange);
+        centerPanel.setPreferredSize(new Dimension(currentPanel.getWidth(),currentPanel.getHeight()-100));
+        centerPanel.setBackground(Color.WHITE);
+
+        JLabel annouce=new JLabel("The semester session for registration is end!");
+        annouce.setFont(new Font("Arial",Font.PLAIN,20));
+        annouce.setForeground(Color.RED);
+        centerPanel.add(annouce);
+
+        currentPanel.add(centerPanel,BorderLayout.CENTER);
+        currentPanel.add(bottomPanel,BorderLayout.SOUTH);
+
     }
 
     public int countRegisted(String openID)
@@ -733,33 +793,82 @@ public class StudentUI
         return count;
     }
 
-    public Object[][] getAllRegistedCourse()
+    public static Object[][] getAllRegistedCourse(String studentID)
     {
             CourseOpenDAO courseOpenDAO=new CourseOpenDAO();
             SubjectDAO subjectDAO=new SubjectDAO();
             List<Object[]>ret=new ArrayList<>();
-            List<CourseregistEntity>registedData=new CourseregistDAO().getListObject(account);
+            List<CourseregistEntity>registedData=new CourseregistDAO().getListObject(studentID);
             for(int i=0;i<registedData.size();i++)
             {
                 CourseregistEntity curRegist=registedData.get(i);
+                System.out.println(curRegist.getOpenid());
                 CourseopenEntity curCourse=courseOpenDAO.getObject(curRegist.getOpenid());
-                SubjectEntity subject=subjectDAO.getObject(curCourse.getSubjectid());
-                Object[]add={
-                        subject.getSubjectid(),
-                        subject.getSubjectname(),
-                        curCourse.getCourseclass(),
-                        subject.getCredit(),
-                        CourseOpenDAO.getShift(curCourse),
-                        curCourse.getTeacher(),
-                        curRegist.getDateregist(),
-                };
-                ret.add(add);
-                System.out.println(add);
+
+                if(curCourse!=null) {
+                    SubjectEntity subject=subjectDAO.getObject(curCourse.getSubjectid());
+                    Object[] add = {
+                            subject.getSubjectid(),
+                            subject.getSubjectname(),
+                            curCourse.getCourseclass(),
+                            subject.getCredit(),
+                            CourseOpenDAO.getShift(curCourse),
+                            curCourse.getTeacher(),
+                            curRegist.getDateregist(),
+                    };
+                    ret.add(add);
+                    System.out.println(add);
+                }
             }
             return ret.toArray(new Object[0][]);
 
     }
 
+
+
+    public Object[][] updateRegistred(Object[][]data,String studentID)
+    {
+        CourseregistDAO courseregistDAO=new CourseregistDAO();
+        List<CourseregistEntity> list=courseregistDAO.getListObject(studentID);
+
+        for(int i=0;i<data.length;i++)
+        {
+            String courseID=(String)data[i][0]+(String) data[i][3];
+            data[i][8]=false;
+            for(int j=0;j<list.size();j++)
+            {
+                CourseregistEntity cur=list.get(j);
+                if(courseID.compareTo(cur.getOpenid())==0)
+                {
+                    data[i][8]=true;
+                    break;
+                }
+            }
+        }
+
+        return data;
+    }
+
+    public Boolean checkSemesterSession()
+    {
+        Date today=new Date(Calendar.getInstance().getTime().getTime());
+        SemesterSessionDAO semesterSessionDAO=new SemesterSessionDAO();
+        Boolean check=false;
+        List<SemestersessionEntity> list=semesterSessionDAO.getListObjects();
+        for(int i=0;i<list.size();i++)
+        {
+            SemestersessionEntity cur=list.get(i);
+            Date begin=cur.getDatebegin();
+            Date end=cur.getDateend();
+            System.out.println(begin);
+            System.out.println(end);
+            System.out.println(today.compareTo(begin));
+            System.out.println(today.compareTo(end));
+            if(today.compareTo(begin)>=0&&today.compareTo(end)<=0)
+                return true;
+        }
+        return check;
+    }
 }
 
 

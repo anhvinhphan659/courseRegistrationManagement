@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import HibernateUtil.hibernateUtil;
 
 public class MainUI
 {
@@ -13,6 +14,7 @@ public class MainUI
     public static final int _TEXTFIELD_WITDH= 200;
     public static final int _TEXTFIELD_HEIGHT =40;
     public static final String _FONT_STYLE ="Times New Roman";
+    private static ImageIcon logoImage;
     public MainUI()
     {
         mainframe=new JFrame("COURSE REGISTARION");
@@ -20,9 +22,13 @@ public class MainUI
         mainframe.setSize(new Dimension(800,600));
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainframe.setBackground(Color.WHITE);
-        mainframe.setIconImage(new ImageIcon("resources/main_logo_crm.png").getImage());
+        mainframe.setIconImage(new ImageIcon("image/main_logo_crm.png").getImage());
         mainframe.setResizable(false);
         mainframe.setVisible(true);
+
+        logoImage=new ImageIcon("image/half_logo.png");
+        Image img=logoImage.getImage().getScaledInstance(200,200,Image.SCALE_DEFAULT);
+        logoImage.setImage(img);
     }
 
     public JFrame getMainframe()
@@ -44,7 +50,10 @@ public class MainUI
         mainPanel.setBounds(100,50,600,400);
         mainframe.add(mainPanel);
 
+
         mainframe.setVisible(true);
+        //initialize empty session
+        hibernateUtil init=new hibernateUtil();
     }
 
     public JPanel setUpLogin()
@@ -72,21 +81,24 @@ public class MainUI
         centerPanel.setBackground(Color.WHITE);
         JLabel acc_label=new JLabel("Account: ");
         JLabel pass_label=new JLabel("Password: ");
-        acc_label.setBounds(50,80,100,_TEXTFIELD_HEIGHT);
+        acc_label.setBounds(40,80,100,_TEXTFIELD_HEIGHT);
         acc_label.setFont(new Font(_FONT_STYLE,Font.PLAIN,16));
-        pass_label.setBounds(50,80+_TEXTFIELD_HEIGHT+10,100,_TEXTFIELD_HEIGHT);
+        pass_label.setBounds(40,80+_TEXTFIELD_HEIGHT+10,100,_TEXTFIELD_HEIGHT);
         pass_label.setFont(new Font(_FONT_STYLE,Font.PLAIN,16));
         JTextField account=new JTextField();
         JTextField pass=new JTextField();
-        account.setBounds(200,80,_TEXTFIELD_WITDH,_TEXTFIELD_HEIGHT);
+        account.setBounds(150,80,_TEXTFIELD_WITDH,_TEXTFIELD_HEIGHT);
         account.setFont(new Font(_FONT_STYLE,Font.BOLD,18));
-        pass.setBounds(200,account.getY()+10+_TEXTFIELD_HEIGHT,_TEXTFIELD_WITDH,_TEXTFIELD_HEIGHT);
+        pass.setBounds(150,account.getY()+10+_TEXTFIELD_HEIGHT,_TEXTFIELD_WITDH,_TEXTFIELD_HEIGHT);
         pass.setFont(new Font(_FONT_STYLE,Font.BOLD,18));
+        JLabel logoLabel=new JLabel(logoImage);
+        logoLabel.setBounds(350,60,200,200);
 
         centerPanel.add(account);
         centerPanel.add(acc_label);
         centerPanel.add(pass);
         centerPanel.add(pass_label);
+        centerPanel.add(logoLabel);
         centerPanel.setBorder(BorderFactory.createLineBorder( Color.BLACK));
 
         JButton signin=new JButton("SIGN IN");
@@ -124,9 +136,8 @@ public class MainUI
                             JOptionPane.showMessageDialog(null,"Account is not existed! Please contact with Academic Faculty to get account!");
                             break;
                         case 1:
-                            StudentUI studentUI=new StudentUI();
-                            studentUI.setAccount(acc);
-                            studentUI.setPass(pas);
+                            StudentUI studentUI=new StudentUI(acc,pas);
+
                             mainframe.dispose();
 
 

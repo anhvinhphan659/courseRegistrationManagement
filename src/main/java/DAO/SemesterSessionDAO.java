@@ -19,11 +19,15 @@ public class SemesterSessionDAO
     public SemesterSessionDAO()
     {
         hibernateUtil hb=new hibernateUtil();
-        session=hb.getSessionfactory().openSession();
+
+            session=hb.getSessionfactory().openSession();
 
 
-            System.out.println("Initial Transaction at Intialize");
+
+
+        System.out.println("Initial Transaction at Intialize");
             tx = session.beginTransaction();
+
 
 
     }

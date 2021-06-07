@@ -157,6 +157,13 @@ class addActionHandle
             StudentDAO studentDAO=new StudentDAO();
             StudentEntity obj=new StudentEntity(dataObj);
             studentDAO.saveObject(obj);
+            CRMuserDAO crMuserDAO=new CRMuserDAO();
+            CrmuserEntity userObj=new CrmuserEntity();
+            userObj.setAccount(obj.getUserid());
+            userObj.setPass("123456");
+            userObj.setIsadmin(false);
+            userObj.setUserid("ST"+obj.getUserid());
+            crMuserDAO.saveOrUpdateObject(userObj);
 
         }
         if(SemesterDAO.class.equals(saveClass))
@@ -301,6 +308,7 @@ class editActionHanle
                     }
                     if(CMD.compareTo("Semester")==0)
                     {
+
                         editData(dataObj,SemesterDAO.class);
 
                         JOptionPane.showMessageDialog(null,"Update Semester successfully!");
@@ -419,7 +427,7 @@ class editActionHanle
         for(int i=0;i<len;i++)
         {
             String id=(String) data[i][0];
-            if(id.compareTo(currentSemester)>=0)
+            if(id.compareTo(currentSemester)==0)
             {
 
                 Boolean state=(Boolean) data[i][lenData-1];
@@ -521,11 +529,15 @@ class handleData {
         return ret.toArray();
     }
 
+    public static void sortData(Object[]data)
+    {
+        Arrays.sort(data);
+
+    }
     public static Object[][] filterData(Object[][] origindata, int column, String cur) {
         List<Object[]> ret = new ArrayList<>();
         List<Object[]> data = Arrays.asList(origindata);
-        System.out.println(column);
-        System.out.println(data.size());
+
         for (int i = 0; i < data.size(); i++) {
             String text;
             if (data.get(i)[column] == null)
@@ -542,12 +554,12 @@ class handleData {
             if (text.indexOf(cur) >= 0)
                 ret.add(origindata[i]);
         }
-        System.out.println(ret.size());
+
         return ret.toArray(new Object[0][]);
     }
 
     public static Object[][] getDataWithValue(Object[][] data, int Column, Object val) {
-        System.out.println((String) val);
+
         int len = data.length;
         List<Object[]> retList = new ArrayList<>();
         for (int i = 0; i < len; i++) {

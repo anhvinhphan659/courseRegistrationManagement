@@ -2,10 +2,7 @@ package DAO;
 
 
 import POJO.CrmuserEntity;
-import org.hibernate.Session;
-import org.hibernate.Query;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import HibernateUtil.hibernateUtil;
 import org.hibernate.cfg.Configuration;
 
@@ -15,10 +12,15 @@ import java.util.List;
 
 public class CRMuserDAO
 {
-    private SessionFactory sessionFactory=new Configuration().configure().buildSessionFactory();
-    private Session session=sessionFactory.openSession();
+
+    private Session session;
     public CRMuserDAO()
     {
+        hibernateUtil hb=new hibernateUtil();
+        if(session==null)
+            session=hb.getSessionfactory().openSession();
+        else
+            session=hb.getSessionfactory().getCurrentSession();
 
 
     }
@@ -32,6 +34,15 @@ public class CRMuserDAO
        session.getTransaction().commit();
 
 
+    }
+
+    public void saveOrUpdateObject(CrmuserEntity user)
+    {
+        if(session.getTransaction()==null)
+            session.beginTransaction();
+
+        session.saveOrUpdate(user);
+        session.getTransaction().commit();
     }
 
     public CrmuserEntity getObject(String userID)
